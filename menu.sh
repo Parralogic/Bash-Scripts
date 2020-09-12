@@ -14,6 +14,8 @@ if [[ $(command -v konsole) ]];then
 exec konsole  -e ./$SCRIPT & 
 elif [[ $(command -v xterm) ]];then
 exec xterm -e ./$SCRIPT &
+elif [[ $(command -v gnome-terminal) ]];then
+gnome-terminal -- ./$SCRIPT &
 else 
 "$SCRIPT can't be executed, no compatible terminal."
 fi
