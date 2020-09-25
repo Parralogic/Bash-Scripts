@@ -28,7 +28,7 @@ command -v $app > /dev/null 2>&1
 if [[ $? = 0 ]]; then
 echo $app Installed
 else echo "$app Not Installed......Installing < $app"
-apt-get install $app
+sudo apt-get install $app
 fi
 done
 elif [[ -f $(command -v rpm) ]]; then
