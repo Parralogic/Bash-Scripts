@@ -36,6 +36,7 @@ else
 read -p "nmap not installed, press Enter to install"
 sudo apt-get update && sudo apt-get install nmap
 fi
+sleep 1
 clear
 echo -e "re-verifying if apps are installed\n"
 sleep 2
@@ -50,6 +51,3 @@ fi
 sleep 1
 done
 clear
-
-
-
