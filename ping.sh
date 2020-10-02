@@ -4,13 +4,13 @@ while true; do
 clear
 echo -e "\e[31mNow pinging ROUTER, MODEM and WWW\e[00m"
 echo
-ping -c 1 192.168.0.1 2> /dev/null  | echo "Router: $(grep ttl)"; sleep 1
+ping -c 1 192.168.0.1 2> /dev/null  | echo "Router: $(grep ttl)"
 if [[ $? = 0 ]]; then
 echo
-ping -c 1 192.168.100.1 2> /dev/null | echo -e "Modem: $(grep ttl)"; sleep 1
+ping -c 1 192.168.100.1 2> /dev/null | echo -e "Modem: $(grep ttl)"
 fi
 echo
-ping -c 3 parralogic.ddns.net 1> /dev/null
+ping -c 3 www.google.com 1> /dev/null
 if [[ $? = 0 ]]; then
 echo -e "WWW:\e[92mSuccessful\e[00m"
 curl ifconfig.me
