@@ -3,31 +3,18 @@
 #Date: 10/03/2020
 #Last Modified: 10/06/2020
 clear
-
-echo -e "Checking for requirments!"
-sleep 3
+PS3="NIC#?:"
+echo -e "Checking for requirments!\n"
 for app in aircrack-ng macchanger xterm; do
 command -v $app 2>&1> /dev/null
 if [[ $? = 0 ]]; then
-echo great! $app installed
+echo -e "great! $app installed\n"
 else echo "$app not installed, script will not function correctly!"
 fi
 done
 ########################################################################################################################################
 Deauth_Single () {
-if [[ ${UID} = 0 ]];then
-echo -e "#Select Network Adapter#"
-select NETWORK in $(ls /sys/class/net); do
-ADAPTER=$NETWORK
-read -p "Is this the correct adapter $ADAPTER! (y/n):" CHOICE
-if [[ $CHOICE = [yY]* ]]; then
-break
-elif [[ $CHOICE = [nN]* ]]; then
-echo "re-running selection!"
-sleep 2
-fi
-done
-clear
+    single () {
 wifi=$ADAPTER
 sudo airmon-ng start $wifi 2>&1> /dev/null
 clear
@@ -54,27 +41,28 @@ fi
 
 sudo airmon-ng stop $wlan0
 sudo ip link set $wifi down && sudo ip link set $wifi up
+}
+if [[ ${UID} = 0 ]];then
+echo -e "#Select Network Adapter#"
+select NETWORK in $(ls /sys/class/net); do
+ADAPTER=$NETWORK
+read -p "Is this the correct adapter $ADAPTER! (y/n/q=quit):" CHOICE
+case $CHOICE in
+y|Y) single;break;;
+n|N) echo "re-running slection!";sleep 1;;
+q|Q) break;;
+*) echo "invalid input"
+esac
+done
 else 
-echo -e "Only root/sudo can run this Function!"
-sleep 6
+echo -e "\e[91mOnly root/sudo can run this Function!\e[00m"
+sleep 3
 fi
 clear
 }
 ########################################################################################################################################
 Deauth_ALL () {
-if [[ ${UID} = 0 ]];then
-echo -e "#Select Network Adapter#"
-select NETWORK in $(ls /sys/class/net); do
-ADAPTER=$NETWORK
-read -p "Is this the correct adapter $ADAPTER! (y/n):" CHOICE
-if [[ $CHOICE = [yY]* ]]; then
-break
-elif [[ $CHOICE = [nN]* ]]; then
-echo "re-running selection!"
-sleep 2
-fi
-done
-clear
+    all () {
 wifi=$ADAPTER
 sudo airmon-ng start $wifi 2>&1> /dev/null
 clear
@@ -99,9 +87,22 @@ fi
 
 sudo airmon-ng stop $wlan0
 sudo ip link set $wifi down && sudo ip link set $wifi up
+}
+if [[ ${UID} = 0 ]];then
+echo -e "#Select Network Adapter#"
+select NETWORK in $(ls /sys/class/net); do
+ADAPTER=$NETWORK
+read -p "Is this the correct adapter $ADAPTER! (y/n/q=quit):" CHOICE
+case $CHOICE in
+y|Y) all;break;;
+n|N) echo "re-running selection!";sleep 1;;
+q|Q) break;;
+*) echo "invalid input";;
+esac
+done
 else
-echo -e "Only root/sudo can run this Function!"
-sleep 6
+echo -e "\e[91mOnly root/sudo can run this Function!\e[00m"
+sleep 3
 fi
 clear
 }
@@ -128,8 +129,8 @@ read -p "macchanger needs root permissions, press Enter to continue"
 sudo ip link set $ADAPTER down && sudo macchanger -A $ADAPTER && sudo ip link set $ADAPTER up
 read -p "Press Enter to continue"
 else
-echo -e "Only root/sudo can run this Function!"
-sleep 6
+echo -e "\e[91mOnly root/sudo can run this Function!\e[00m"
+sleep 3
 fi
 clear
 }
@@ -139,10 +140,10 @@ while true; do
 ping -c1 192.168.0.1 && ping -c1 192.168.100.1 && ping -c1 www.yhaoo.com
 if [ $? = 0 ]; then
 echo
-echo -e "Success!"
+echo -e "\e[92mSuccess!\e[00m"
 sleep 3
 break
-else echo -e "Unsuccessful!"
+else echo -e "\e[91mUnsuccessful!\e[00m"
 sleep 3
 fi
 done
@@ -207,8 +208,8 @@ echo
 read -p "Great! Handshake Captured: Press Enter.."
 rm -i $HOME/handshake/$HAND*
 else
-echo -e "Only root/sudo can run this Fuction!"
-sleep 6
+echo -e "\e[91mOnly root/sudo can run this Fuction!\e[00m"
+sleep 3
 fi
 clear
 }
@@ -235,7 +236,7 @@ cd $DIRECTORY
 ls
 crack
 else echo "root user has no Handshake Captures"
-sleep 6
+sleep 3
 fi
 clear
 }
@@ -243,35 +244,35 @@ clear
 Port_Scan () {
 while true; do
 echo -e "###################################################################################################################################"
-echo -e "1).Ping_Scan=Scans the list of devices up and running on a given subnet."
+echo -e "1).\e[32mPing_Scan\e[00m=Scans the list of devices up and running on a given subnet."
 echo -e "             Example nmap -sn 192.168.1.1/24"
 echo
-echo -e "2).Scan_a_Single_Host=Scans a single host for 1000 well-known ports." 
+echo -e "2).\e[32mScan_a_Single_Host\e[00m=Scans a single host for 1000 well-known ports." 
 echo -e "                      These ports are the ones used by popular services like SQL, SNTP, apache, and others."
 echo -e "                      Example nmap scanme.nmap.org"
 echo
-echo -e "3).Stealth_Scan=Stealth scanning is performed by sending an SYN packet and analyzing the response." 
+echo -e "3).\e[32mStealth_Scan\e[00m=Stealth scanning is performed by sending an SYN packet and analyzing the response." 
 echo -e "                If SYN/ACK is received, it means the port is open, and you can open a TCP connection."
 echo -e "                However, a stealth scan never completes the 3-way handshake, which makes it hard for" 
 echo -e "                the target to determine the scanning system."
 echo -e "                Example nmap -sS scanme.nmap.org"
 echo
-echo -e "4).Version_Scanning=Finding application versions is a crucial part in penetration testing."
+echo -e "4).\e[32mVersion_Scanning\e[00m=Finding application versions is a crucial part in penetration testing."
 echo -e "                    It makes your life easier since you can find an existing vulnerability" 
 echo -e "                    from the Common Vulnerabilities and Exploits (CVE) database for a particular" 
 echo -e "                    version of the service. You can then use it to attack a machine using an exploitation tool like Metasploit."
 echo -e "                    Example nmap -sV scanme.nmap.org"
 echo
-echo -e "5).OS_Scanning=In addition to the services and their versions,"
+echo -e "5).\e[32mOS_Scanning\e[00m=In addition to the services and their versions,"
 echo -e "               Nmap can provide information about the underlying operating system using TCP/IP fingerprinting." 
 echo -e "               Nmap will also try to find the system uptime during an OS scan."
 echo -e "               Example nmap -O scanme.nmap.org"
 echo
-echo -e "6).Aggressive_Scanning=Nmap has an aggressive mode that enables OS detection, version detection," 
+echo -e "6).\e[32mAggressive_Scanning\e[00m=Nmap has an aggressive mode that enables OS detection, version detection," 
 echo -e "                       script scanning, and traceroute. You can use the -A argument to perform an aggressive scan."
 echo -e "                       Example nmap -A scanme.nmap.org"
 echo
-echo -e "7).QUIT\n"
+echo -e "7).\e[91mQUIT\e[00m\n"
 echo -e " CREDITS:https://www.freecodecamp.org/news/what-is-nmap-and-how-to-use-it-a-tutorial-for-the-greatest-scanning-tool-of-all-time/"
 echo -e "         ****Manish Shivanandhan****"
 echo -e "1-7\n"
@@ -298,7 +299,7 @@ read -p "PRESS ENTER"
 nmap -sS $SHOST
 }
 if [[ ${UID} -ne 0 ]];then
-echo "Requires root/sudo privileges"
+echo -e "\e[91mRequires root/sudo privileges\e[00m"
 else
 Sscan   
 fi
@@ -318,7 +319,7 @@ read -p "PRESS ENTER"
 nmap -O $OSHOST
 }
 if [[ ${UID} -ne 0 ]];then
-echo "Requires root/sudo privileges"
+echo -e "\e[91mRequires root/sudo privileges\e[00m"
 else
 OSscan
 fi
@@ -362,7 +363,7 @@ echo -e "Running script as [\e[92m$USER!\e[00m]"
 elif [ ${UID} = 0 ]; then
 echo -e "Running script as [\e[91m$USER!\e[00m]"
 fi
-echo "*Please run Port_Scan in full screen, to get best visual results*"
+echo "*Please run Port_Scan in fullscreen, to get best visual results*"
 echo -e "##########################################################"
 echo -e "#   1.Deauth_Single   4.Ping_Network       7.Port_Scan   #"
 echo -e "#   2.Deauth_ALL      5.Capture_Handshake  8.SFTP        #"
