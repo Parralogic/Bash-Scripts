@@ -127,7 +127,7 @@ echo "re-running selection!"
 sleep 1
 fi
 done
-read -p "macchanger needs root permissions, press Enter to continue"
+read -p "macchanger needs root permissions, press Enter to continue ;) "
 sudo ip link set $ADAPTER down && sudo macchanger -A $ADAPTER && sudo ip link set $ADAPTER up
 read -p "Press Enter to continue"
 else
@@ -138,8 +138,28 @@ clear
 }
 ########################################################################################################################################
 Ping_Network () {
+    ping_net () {
+read -p "Whats your router IP?: " ROUTER
+read -p "Whats your modem IP?: " MODEM
+read -p "What Web Site or IP would you like to ping?: " OUT   
+ping -c1 $ROUTER && ping -c1 $MODEM && ping -c1 $OUT
+if [ $? = 0 ]; then
+echo
+echo -e "\e[92mSuccess!\e[00m"
+sleep 3
+break
+else echo -e "\e[91mUnsuccessful!\e[00m"
+sleep 3
+fi
+}
+echo -e "Ping your network to see if you have a working internet connection!" #troubleshooting
+echo -e "Press ENTER for a GENERIC home network setup."
+echo -e "Or type any character then ENTER, for manual input.."
+read -p ""
+if [[ $REPLY = "" ]]; then
 while true; do
-ping -c1 192.168.0.1 && ping -c1 192.168.100.1 && ping -c1 www.yhaoo.com
+ping -c1 192.168.0.1 || ping -c1 192.168.1.1 && ping -c1 192.168.100.1 || ping -c1 10.0.0.1 && ping -c1 www.yhaoo.com
+#ping -c1 $ROUTER && ping -c1 $MODEM && ping -c1 $OUT
 if [ $? = 0 ]; then
 echo
 echo -e "\e[92mSuccess!\e[00m"
@@ -149,6 +169,9 @@ else echo -e "\e[91mUnsuccessful!\e[00m"
 sleep 3
 fi
 done
+else
+ping_net
+fi
 clear
 }
 ########################################################################################################################################
@@ -174,6 +197,15 @@ clear
 wlan0=$(ip a | grep mon | head -1 | cut -d ":" -f 2)
 sudo ip link set $wlan0 down && sudo macchanger -A $wlan0 && sudo ip link set $wlan0 up
 clear
+read -p "Capture handshake on the 1.)2.4GHz or 2.)5GHz frequency?: " OPTION
+case $OPTION in
+1) echo "2.4GHz it is!"
+sleep 1;;
+2) echo "5GHz it is!"
+sleep 1;;
+*) echo -e " Not Valid number only 1 & 2 "
+sleep 2;;
+esac
 exec xterm -e sudo airodump-ng $wlan0 &
 echo -e "Now Scanning all 2.4GHz WiFiChannels"
 echo -e "Select the channel of your target AP"
@@ -220,6 +252,7 @@ clear
 ########################################################################################################################################
 Crack_Handshake () {
     crack () {
+echo
 read -p "Name of captured packet to crack:? " PACKET
 read -p "Name of kismet.csv:? " KISMET
 read -p "Path of the wordlist:? " WORD
@@ -227,20 +260,26 @@ BSSID=$(cat $KISMET | awk -F "," '{ print $1 }' | cut -d ";" -f 4 | tail -1)
 ESSID=$(cat $KISMET | awk -F "," '{ print $1 }' | cut -d ";" -f 3 | tail -1)
 exec xterm -hold -e aircrack-ng -e $ESSID -b $BSSID -w $WORD $PACKET & 
 }
-if [[ -d /root/handshake ]];then
+if [[ -d /root/handshake ]] && [[ -f $(find /root/handshake/ -name "*.cap") ]];then
 cd /root/handshake
 ls
-echo
 crack
 elif [[ ${UID} -ne 0 ]]; then
 HOME=$HOME
 cd $HOME
-echo -e "Path of Captured Handshake:?"
+echo -e "Full path of Captured Handshake:?"
+echo -e "If path dosen't exist it will go back to main menu..."
+echo -e "Or enter anything on all prompts to go back\n"
 read DIRECTORY
 cd $DIRECTORY
-ls
+if [[ $? -ne 0 ]]; then
+echo "Error: no $DIRECTORY"
+sleep 3
+else
 echo
+ls
 crack
+fi
 else echo "root user has no Handshake Captures"
 sleep 3
 fi
