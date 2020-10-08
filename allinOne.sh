@@ -71,7 +71,8 @@ wlan0=$(ip a | grep mon | head -1 | cut -d ":" -f 2)
 sudo ip link set $wlan0 down && sudo macchanger -A $wlan0 && sudo ip link set $wlan0 up 2>&1> /dev/null
 clear
 exec xterm -e sudo airodump-ng -b abg $wlan0 &
-echo -e "\e[92mWorks with both 2.4GHz & 5GHz!\e[00m"
+echo -e "\e[92mWorks with both 2.4GHz & 5GHz!\e[00m:" 
+echo -e "you just need the right equipment/wifi chipset!"
 echo "What channel to use for the attack?"
 read CH
 if [[ $CH -lt 14 ]]; then
