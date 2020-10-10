@@ -399,8 +399,8 @@ echo
 echo -e "7).\e[91mQUIT\e[00m\n"
 echo -e " CREDITS:https://www.freecodecamp.org/news/what-is-nmap-and-how-to-use-it-a-tutorial-for-the-greatest-scanning-tool-of-all-time/"
 echo -e "         ****Manish Shivanandhan****"
-echo -e "1-7\n"
-read -p "#?"
+echo -e "(1-7)\n"
+read -p "#? "
 clear
 case $REPLY in
 1)echo -e "Ping_Scan"
