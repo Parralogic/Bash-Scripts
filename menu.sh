@@ -1,10 +1,10 @@
 #!/bin/bash
 #Creator: David Parra-Sandoval
 #Date: 5/17/2020
-#Last Modified Date: 9/03/2020
+#Last Modified Date: 10/12/2020
 clear
 
-cd /home/david/Templates/Scripts
+cd /home/david/Templates/Bash-Scripts
 
 PS3="Script #?: "
 
