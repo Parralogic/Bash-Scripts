@@ -1,7 +1,7 @@
 #!/bin/bash
 #Creator: David Parra-Sandoval
 #Date: 10/10/2020
-#Last Modified: 10/12/2020
+#Last Modified: 10/13/2020
 clear
 
 if [[ ${UID} -ne 0 ]]; then
@@ -17,11 +17,7 @@ echo "Script will not work without $app!!"
 echo "Or will not work correctly!!"
 fi
 done
-modify () {
-sed -i "s|FILE|$TRUSTED|" enforcer.sh
-sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/$MYBSSID/" enforcer.sh enforce4all.sh
-sed -i "s/time/$STOPTIME/" timer.sh #enforce4all.sh
-}
+
 #####################################################################################################################
 WiFi24GHz () {
 #until [[ $CHOICE = [yY]* ]]; do      ????????????????????????????????????????????????
@@ -169,7 +165,21 @@ echo -e "unknown clients/macs at the same time!"
 read -p "1=enforcer 2=enforce4all (1 or 2) "
 if [[ $REPLY = 2 ]]; then
 while true; do
+echo -e "Recommended 21 and up!"
 read -p "Deauth Count:? " COUNT
+if [[ $COUNT = 0 ]]; then
+COUNT=COUNT
+elif [[ $COUNT = 1 ]]; then
+COUNT=COUNT
+elif [[ $COUNT = 2 ]]; then
+COUNT=COUNT
+elif [[ $COUNT = 10 ]]; then
+COUNT=COUNT
+elif [[ $COUNT = 11 ]]; then
+COUNT=COUNT
+elif [[ $DEAUTH = 20 ]]; then
+COUNT=COUNT
+fi
 sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/$MYBSSID/" enforcer.sh enforce4all.sh
 sed -i "s/COUNT/$COUNT/" enforce4all.sh
 exec xterm -iconic -e sudo airodump-ng -c $CH $wlan0 &
@@ -179,15 +189,19 @@ sudo ./enforce4all.sh
 sed -i "s/$COUNT/COUNT/" enforce4all.sh
 sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/00:00:00:00:00:00/" enforcer.sh enforce4all.sh
 echo -e "Press Enter to re-execute enforce4all."
-read -p "OR number 1 for enforcer :"
+read -p "Or 1 to run enforcer q=quit!: " OPTION
 clear
-case $REPLY in
-1) clear;kill $!;break;clear;;
+case $OPTION in
+1) break;;
+q|Q) sudo airmon-ng stop $wlan0 2>&1> /dev/null;exit 1;;
 *) echo "";;
 esac
 done
 else
-read -p "Run enforcer every ?min/?Hour?(m/h) "
+exec xterm -iconic -e sudo airodump-ng -c $CH $wlan0 &
+sleep .5
+kill $!
+read -p "Run enforcer every ?min/?Hour: (m/h) "
 if [[ $REPLY = h ]]; then
 read -p "How many hours:? " HOUR
 let "hour= 60 * 60"
@@ -197,10 +211,8 @@ read -p "How many min:? " MIN
 let "min= 60 * 1" ##
 let "TIME= $min * $MIN"
 fi
-exec xterm -iconic -e sudo airodump-ng -c $CH $wlan0 &
-sleep .5
-kill $!
-read -p "How long do you really wanna keep the attack/enforcer going for:?(m/h) "
+echo -e "How long do you really wanna keep the"
+read -p "attack/enforcer going for:?(m/h) "
 if [[ $REPLY = h ]]; then
 read -p "How many hours:? " STOPh
 STOPTIME=$((60 * $STOPh * 60))
@@ -208,33 +220,52 @@ else
 read -p "How many min:? " STOPm
 STOPTIME=$(( 60 * $STOPm ))
 fi
-modify
+sed -i "s|FILE|$TRUSTED|" enforcer.sh
+sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/$MYBSSID/" enforcer.sh enforce4all.sh
+sed -i "s/time/$STOPTIME/" timer.sh
 exec sudo xterm -geometry 60x2 -e ./timer.sh &
-sleep .5
 fi
-#sed -i "s/$STOPTIME/time/" timer.sh
 while true; do
 for mac in $(diff <(arp -n | awk '{print $3}') $TRUSTED | grep "<"); do
 if [[ $mac = HWaddress ]]; then
-sed -i "s/$STOPTIME/time/" timer.sh enforce4all.sh;clear
+echo "";clear
 elif [[ $mac = "<" ]]; then
 echo "";clear
 elif [[ $mac = enp* ]];then
-echo "";clear
+sed -i "s/$STOPTIME/time/" timer.sh;clear
 else
 echo $mac
-echo "Because the above MAC is not trusted enforcer will" 
-echo "disconnect all untrust MAC's!, enforcer will run every $TIME sec"
+echo "Because the above MAC is not trusted enforcer will;" 
+echo "disconnect all untrust MAC's! One by One." 
+echo "enforcer will run every $TIME sec"
 echo "For $STOPTIME sec"
 echo "You do the math" #remember ;)
 sudo xterm -e ./enforcer.sh &
 PID=$!
 sleep $TIME
 kill $PID
+sed -i "s/$STOPTIME/time/" timer.sh
 fi
 done
 done
 }
+#######################################################################################################################
+if [[ $(ip a | grep mon | head -1 | cut -d ":" -f 2) = wlan0mon ]]; then
+exec xterm -hold -e sudo airodump-ng $wlan0 &
+PID=$!
+read -p "What's your Router/AP WiFi Channel:? " CH
+read -p "What's your Router/AP BSSID MAC Address:? " MYBSSID
+sleep 1                                                                           #Save time!
+kill $PID
+SUBNET=$(ip a | grep dynamic | cut -d " " -f8)
+if [[ $SUBNET = 192.168.1.255 ]];then
+SUBNET=192.168.1.1
+else
+SUBNET=192.168.0.1
+fi
+GATEWAY_MAC=$(arp -a | grep "$SUBNET" | grep gateway | cut -d " " -f4)
+DEFAULT
+fi
 #######################################################################################################################
 echo
 echo "You need two WiFi adapters one that can"
@@ -283,16 +314,13 @@ clear
 sudo airmon-ng start $ADAPTER 2>&1> /dev/null
 wlan0=$(ip a | grep mon | head -1 | cut -d ":" -f 2)
 sudo ip link set $wlan0 down 2>&1> /dev/null
-sleep 1
 sudo macchanger -A $wlan0  2>&1> /dev/null
-sleep 1
 sudo ip link set $wlan0 up 2>&1> /dev/null
-sleep 1
 exec xterm -hold -e sudo airodump-ng $wlan0 &
 PID=$!
 read -p "What's your Router/AP WiFi Channel:? " CH
 read -p "What's your Router/AP BSSID MAC Address:? " MYBSSID
-sleep 1
+sleep 2
 kill $PID
 SUBNET=$(ip a | grep dynamic | cut -d " " -f8)
 if [[ $SUBNET = 192.168.1.255 ]];then
@@ -320,7 +348,6 @@ case $REPLY in
 1) WiFi24GHz;;
 2) WiFi5GHz;;
 ""|" ") DEFAULT;;
-*) echo " "
 esac
 
 
