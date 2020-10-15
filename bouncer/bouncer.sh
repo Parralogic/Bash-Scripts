@@ -4,6 +4,15 @@
 #Last Modified: 10/13/2020
 clear
 
+WiFi5 () {
+echo "NOTE! executing the 5GHz script will deauth all WiFi cliets/macs"
+echo "off the 5GHz network that includes all the trusted macs on the 5GHz network!" 
+read -p "Do you wish to continue? Press Enter"
+sed -i "s/CHANNEL/$CH/" enforcer5GHz.sh
+sed -i "s|FILE|$TRUSTED|" enforcer5GHz.sh
+sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/$MYBSSID/" enforcer5GHz.sh 
+exec sudo xterm -e ./enforcer5GHz.sh
+}
 DEFAULT () {
 SUBNET=$(ip a | grep dynamic | cut -d " " -f8)
 if [[ $SUBNET = 192.168.1.255 ]];then
@@ -18,13 +27,16 @@ diff <(arp -n | awk '{print $3}') $TRUSTED | grep "<"
 diff <(arp -n | awk '{print $3}') $TRUSTED | grep "<" > untrust
 cat untrust | cut -d " " -f2 > untrustmac
 echo
-echo -e "Note the above MAC's are untrusted! they will be attacked!!"
+echo "Note the above MAC's are untrusted! they will be attacked!!"
 echo
-echo -e "Run enforcer or enforce4all:?"
-echo -e "enforcer= Uses a time script!"
-echo -e "enforce4all= No time script! just a one time"
-echo -e "mass-deauthentication on all" 
-echo -e "unknown clients/macs at the same time!"
+echo  "Run enforcer or enforce4all:?"
+echo
+echo  "enforcer= Uses a time script!"
+echo
+echo  "enforce4all= No time script! just a one time"
+echo  "mass-deauthentication on all" 
+echo  "unknown clients/macs at the same time!"
+echo
 read -p "1=enforcer 2=enforce4all (1 or 2) "
 echo
 if [[ $REPLY = 2 ]]; then
@@ -52,7 +64,7 @@ kill $!
 sudo ./enforce4all.sh
 sed -i "s/$COUNT/COUNT/" enforce4all.sh
 sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/00:00:00:00:00:00/" enforcer.sh enforce4all.sh
-echo -e "Press Enter to re-execute enforce4all."
+echo "Press Enter to re-execute enforce4all."
 read -p "Or 1 to run enforcer q=quit!: " OPTION
 clear
 case $OPTION in
@@ -113,79 +125,8 @@ fi
 done
 done
 }
-#####################################################################################################################
- WiFi5GHz () {
-    WTF () {
-    read -p "Input the Subnet:? " SUBNET
-    read -p "Router/AP 5GHz MAC:? " MAC
-    read -p "Is this correct Sub:$SUBNET Mac:$MAC ?(y/n) " CHOICE
-    }
-until [[ $CHOICE = [yY]* ]]; do       #??????????????????????????????????????????????????
-#while [[ $CHOICE = [nN]* ]]; do       #??????????????????????????????????????????????????
-read -p "Input the Subnet:Ex.192.168.0.1-254 or 192.168.0.1/24? " SUBNET
-read -p "Router/AP 5GHz MAC:? " MAC
-read -p "Is this correct Sub:$SUBNET Mac:$MAC ?(y/n) " CHOICE
-done                                  #??????????????????????????????????????????????????WTF
-#case $CHOICE in
-#y|Y) echo "";;
-#n|N) WTF;;
-#*) wtf;;
-#esac
-echo "Please wait...will take a min...!"
-nmap $SUBNET -F -r 2>&1> /dev/null
-sleep 6
-diff <(arp -n | awk '{print $3}') $TRUSTED | grep "<"
-diff <(arp -n | awk '{print $3}') $TRUSTED | grep "<" > untrust
-cat untrust | cut -d " " -f2 > untrustmac
-echo -e "Note the above MAC's are untrusted! they will be attacked!!"
-read -p "Run bouncer every ?min/?Hour?(m/h) "
-if [[ $REPLY = h ]]; then
-read -p "How many hours:? " HOUR
-let "hour= 60 * 60"
-let "TIME= $hour * $HOUR"wlan0=$(ip a | grep mon | head -1 | cut -d ":" -f 2)
-else
-read -p "How many min:? " MIN
-let "min= 60 * 1" ##
-let "TIME= $min * $MIN"
-fi
-exec xterm -iconic -e sudo airodump-ng -c $CH $wlan0 &
-sleep .5
-kill $!
-read -p "How long do you really wanna keep the attack/enforcer going for:?(m/h) "
-if [[ $REPLY = h ]]; then
-read -p "How many hours:? " STOPh
-STOPTIME=$((60 * $STOPh * 60))
-else
-read -p "How many min:? " STOPm
-STOPTIME=$(( 60 * $STOPm ))
-fi
-modify
-exec sudo xterm -geometry 60x2 -e ./timer.sh &
-sleep .5
-sed -i "s/$STOPTIME/time/" timer.sh
-while true; do
-for mac in $(diff <(arp -n | awk '{print $3}') $TRUSTED | grep "<"); do
-if [[ $mac = HWaddress ]]; then
-echo "";clear
-elif [[ $mac = "<" ]]; then
-echo "";clear
-else
-echo $mac
-echo "Because the above MAC is not trusted enforcer will" 
-echo "disconnect all untrust MAC's!;enforcer will run every $TIME sec"
-echo "For $STOPTIME sec"
-echo "You do the math" #remember ;)
-sleep 1
-sudo xterm  -e ./enforcer.sh &
-PID=$!
-sleep $TIME
-kill $PID
-fi
-done
-done
-}
-#######################################################################################################################
-if [[ ${UID} -ne 0 ]]; then
+
+ if [[ ${UID} -ne 0 ]]; then
 echo run as root/sudo
 exit 1
 fi
@@ -228,16 +169,16 @@ echo "$TRUSTED does not exist!"
 macfile
 fi
 echo
-echo -e "First Xterm will open to gather info"
-echo -e "about your Router/AP"
-echo -e "#Select WiFi interface to deploy enforcer/4all:#"
-echo -e "enp=Ethernet wl=WiFi lo=loopback address"
+echo  "First Xterm will open to gather info"
+echo  "about your Router/AP"
+echo  "#Select WiFi interface to deploy enforcer/4all/5GHz:#"
+echo  "enp=Ethernet wl=WiFi lo=loopback address"
 select NETWORK in $(ls /sys/class/net);do
 ADAPTER=$NETWORK
 read -p "Use $ADAPTER:?(y/n) " CHOICE
 case $CHOICE in
 y|Y) break ;;
-n|N) echo -e "Re-Select" ;;
+n|N) echo  "Re-Select" ;;
 *) echo "Only (y/n) re-select interface." ;;
 esac
 done
@@ -247,7 +188,7 @@ wlan0=$(ip a | grep mon | head -1 | cut -d ":" -f 2)
 sudo ip link set $wlan0 down 2>&1> /dev/null
 sudo macchanger -A $wlan0  2>&1> /dev/null
 sudo ip link set $wlan0 up 2>&1> /dev/null
-exec xterm -hold -e sudo airodump-ng $wlan0 &
+exec xterm -hold -e sudo airodump-ng --band abg $wlan0 &
 PID=$!
 read -p "What's your Router/AP WiFi Channel:? " CH
 read -p "What's your Router/AP BSSID MAC Address:? " MYBSSID
@@ -259,26 +200,32 @@ SUBNET=192.168.1.1
 else
 SUBNET=192.168.0.1
 fi
-echo -e "Please wait..gathering info about your network:" 
+echo "Please wait..gathering info about your network:" 
+arp -n 2>&1> /dev/null
+arp -n 2>&1> /dev/null
+arp -a 2>&1> /dev/null
+sleep 2
 GATEWAY_MAC=$(arp -a | grep "$SUBNET" | grep gateway | cut -d " " -f4)
+while true; do
 echo
-echo -e "Your Subnet:$SUBNET-254"
+echo  "Your Subnet:$SUBNET-254"
 echo -e "Your Router/AP MAC:$GATEWAY_MAC\n"
-echo -e "Would you like to use this configuration????"
-echo -e "Note your Router/AP MAC will differ from AP/BSSID" 
-echo -e "In order for this script to work,"
-echo -e "this script needs the WiFi chip MAC of your router."
-echo -e "2.4GHz MAC or 5GHz MAC\n"
-echo -e "Press Enter for default configuration!"
-echo -e "Subnet:$SUBNET"
-echo -e "Router/AP:$GATEWAY_MAC" 
+echo  "Bouncer script will use this configuration:"
+echo  "Note your Router/AP MAC will differ from AP/BSSID" 
+echo  "In order for this script to work,"
+echo  "Script needs the WiFi chip MAC of your router."
+echo  -e "2.4GHz MAC or 5GHz MAC\n"
+echo  "Press Enter for default configuration!"
+echo  "Subnet:$SUBNET"
+echo  "Router/AP:$GATEWAY_MAC" 
 echo -e "AP/BSSID:$MYBSSID\n"
-echo -e "1) Define 2.4GHz MAC  2) Define 5GHz MAC" 
-echo -e "        !under-construction!             "
+echo  "2) 5GHz MAC comming soon" 
+echo  "        !under-construction!             "
 read -p "#? "
 case $REPLY in
-1) WiFi24GHz;;
-2) WiFi5GHz;;
+#1) WiFi24GHz;;
+2) WiFi5 ;;
 ""|" ") DEFAULT;;
 esac
+done
 
