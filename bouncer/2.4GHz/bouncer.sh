@@ -149,7 +149,7 @@ echo  "This script will use nmap to scan your network"
 echo  "and populate the arp table with mac addresses,"
 echo  "then aireplay-ng will use the generated mac list using"
 echo  "arp -a [net-tools package] in conjunction with diff to identify" 
-echo  "the differences in macs"
+echo  "the differences in macs to deauthenticate"
 echo  "based on the trusted mac list provided!"
 echo
 echo -e "Subnet:\e[92m$SUBNET\e[00m"
