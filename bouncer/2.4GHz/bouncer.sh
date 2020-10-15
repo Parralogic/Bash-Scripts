@@ -1,79 +1,10 @@
 #!/bin/bash
 #Creator: David Parra-Sandoval
 #Date: 10/10/2020
-#Last Modified: 10/13/2020
+#Last Modified: 10/15/2020
 clear
 
-WiFi5 () {
-echo "NOTE! executing the 5GHz script will deauth all WiFi cliets/macs"
-echo "off the 5GHz network that includes all the trusted macs on the 5GHz network!" 
-read -p "Do you wish to continue? Press Enter"
-sed -i "s/CHANNEL/$CH/" enforcer5GHz.sh
-sed -i "s|FILE|$TRUSTED|" enforcer5GHz.sh
-sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/$MYBSSID/" enforcer5GHz.sh 
-exec sudo xterm -e ./enforcer5GHz.sh
-}
-DEFAULT () {
-SUBNET=$(ip a | grep dynamic | cut -d " " -f8)
-if [[ $SUBNET = 192.168.1.255 ]];then
-SUBNET=192.168.1.1
-else
-SUBNET=192.168.0.1
-fi
-echo -e "Please wait..will take a min..!"
-nmap $SUBNET-254 -F -r -vv
-sleep 6
-diff <(arp -n | awk '{print $3}') $TRUSTED | grep "<"
-diff <(arp -n | awk '{print $3}') $TRUSTED | grep "<" > untrust
-cat untrust | cut -d " " -f2 > untrustmac
-echo
-echo "Note the above MAC's are untrusted! they will be attacked!!"
-echo
-echo  "Run enforcer or enforce4all:?"
-echo
-echo  "enforcer= Uses a time script!"
-echo
-echo  "enforce4all= No time script! just a one time"
-echo  "mass-deauthentication on all" 
-echo  "unknown clients/macs at the same time!"
-echo
-read -p "1=enforcer 2=enforce4all (1 or 2) "
-echo
-if [[ $REPLY = 2 ]]; then
-while true; do
-echo -e "Recommended 21 and up!"
-read -p "Deauth Count:? " COUNT
-if [[ $COUNT = 0 ]]; then
-COUNT=COUNT
-elif [[ $COUNT = 1 ]]; then
-COUNT=COUNT
-elif [[ $COUNT = 2 ]]; then
-COUNT=COUNT
-elif [[ $COUNT = 10 ]]; then
-COUNT=COUNT
-elif [[ $COUNT = 11 ]]; then
-COUNT=COUNT
-elif [[ $DEAUTH = 20 ]]; then
-COUNT=COUNT
-fi
-sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/$MYBSSID/" enforcer.sh enforce4all.sh
-sed -i "s/COUNT/$COUNT/" enforce4all.sh
-exec xterm -iconic -e sudo airodump-ng -c $CH $wlan0 &
-sleep .5
-kill $!
-sudo ./enforce4all.sh
-sed -i "s/$COUNT/COUNT/" enforce4all.sh
-sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/00:00:00:00:00:00/" enforcer.sh enforce4all.sh
-echo "Press Enter to re-execute enforce4all."
-read -p "Or 1 to run enforcer q=quit!: " OPTION
-clear
-case $OPTION in
-1) break;;
-q|Q) sudo airmon-ng stop $wlan0 2>&1> /dev/null;exit 1;;
-*) echo "";;
-esac
-done
-else
+    enforcer () {
 exec xterm -iconic -e sudo airodump-ng -c $CH $wlan0 &
 sleep .5
 kill $!
@@ -87,6 +18,7 @@ read -p "enforcer will launch every # min:? " MIN
 let "min= 60 * 1" ##
 let "TIME= $min * $MIN"
 fi
+echo
 echo -e "How long do you really wanna keep the"
 read -p "attack/enforcer going for:?(m/h) "
 if [[ $REPLY = h ]]; then
@@ -100,7 +32,7 @@ sed -i "s|FILE|$TRUSTED|" enforcer.sh
 sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/$MYBSSID/" enforcer.sh enforce4all.sh
 sed -i "s/time/$STOPTIME/" timer.sh
 exec sudo xterm -geometry 60x2 -e ./timer.sh &
-fi
+#fi
 while true; do
 for mac in $(diff <(arp -n | awk '{print $3}') $TRUSTED | grep "<"); do
 if [[ $mac = HWaddress ]]; then
@@ -126,15 +58,15 @@ done
 done
 }
 
- if [[ ${UID} -ne 0 ]]; then
+if [[ ${UID} -ne 0 ]]; then
 echo run as root/sudo
 exit 1
 fi
 for app in arp nmap xterm macchanger aircrack-ng ; do
 command -v $app 2>&1> /dev/null
 if [[ $? = 0 ]]; then
-echo -e "Great! $app installed"
-else echo -e "$app not installed :("
+echo -e "\e[92mGreat!\e[00m $app installed"
+else echo -e "\e[91m$app\e[00m not installed :("
 echo "Script will not work without $app!!"
 echo "Or will not work correctly!!"
 fi
@@ -163,15 +95,15 @@ echo "Unknown wireless clients from your wireless network"
 echo "Provided with a list of accepted MAC addresses"
 read -p "Full path of trusted MAC file:?" TRUSTED
 if [[ -f $TRUSTED ]];then
-echo "$TRUSTED will be used to filter out unknown MAC's"
+echo -e "\e[92m$TRUSTED\e[00m will be used to filter out unknown MAC's"
 else
-echo "$TRUSTED does not exist!"
+echo -e "\e[91m$TRUSTED\e[00m does not exist!"
 macfile
 fi
 echo
-echo  "First Xterm will open to gather info"
+echo  "Xterm will open to gather info"
 echo  "about your Router/AP"
-echo  "#Select WiFi interface to deploy enforcer/4all/5GHz:#"
+echo  "#Select WiFi interface to deploy enforcer/4all:#"
 echo  "enp=Ethernet wl=WiFi lo=loopback address"
 select NETWORK in $(ls /sys/class/net);do
 ADAPTER=$NETWORK
@@ -188,8 +120,10 @@ wlan0=$(ip a | grep mon | head -1 | cut -d ":" -f 2)
 sudo ip link set $wlan0 down 2>&1> /dev/null
 sudo macchanger -A $wlan0  2>&1> /dev/null
 sudo ip link set $wlan0 up 2>&1> /dev/null
-exec xterm -hold -e sudo airodump-ng --band abg $wlan0 &
+exec xterm -hold -e sudo airodump-ng $wlan0 &
 PID=$!
+echo -e "\e[33mWarning!\e[00m must use proper MAC address format: \e[5m00:00:00:00:00:00\e[00m!"
+echo -e "OR enforcer/enforce4all will break!\n"
 read -p "What's your Router/AP WiFi Channel:? " CH
 read -p "What's your Router/AP BSSID MAC Address:? " MYBSSID
 sleep 2
@@ -206,26 +140,87 @@ arp -n 2>&1> /dev/null
 arp -a 2>&1> /dev/null
 sleep 2
 GATEWAY_MAC=$(arp -a | grep "$SUBNET" | grep gateway | cut -d " " -f4)
-while true; do
 echo
-echo  "Your Subnet:$SUBNET-254"
-echo -e "Your Router/AP MAC:$GATEWAY_MAC\n"
+echo -e "Your Subnet:\e[92m$SUBNET-254\e[00m"
+echo -e "Your Router/AP MAC:\e[92m$GATEWAY_MAC\e[00m\n"
 echo  "Bouncer script will use this configuration:"
 echo  "Note your Router/AP MAC will differ from AP/BSSID" 
-echo  "In order for this script to work,"
-echo  "Script needs the WiFi chip MAC of your router."
-echo  -e "2.4GHz MAC or 5GHz MAC\n"
-echo  "Press Enter for default configuration!"
-echo  "Subnet:$SUBNET"
-echo  "Router/AP:$GATEWAY_MAC" 
-echo -e "AP/BSSID:$MYBSSID\n"
-echo  "2) 5GHz MAC comming soon" 
-echo  "        !under-construction!             "
-read -p "#? "
+echo  "This script will use nmap to scan your network"
+echo  "and populate the arp table with mac addresses,"
+echo  "then aireplay-ng will use the generated mac list using"
+echo  "arp -a [net-tools package] in conjunction with diff to identify" 
+echo  "the differences in macs"
+echo  "based on the trusted mac list provided!"
+echo
+echo -e "Subnet:\e[92m$SUBNET\e[00m"
+echo -e "Router/AP:\e[92m$GATEWAY_MAC\e[00m" 
+echo -e "AP/BSSID:\e[92m$MYBSSID\e[00m"
+read -p "Press Enter to Continue!"
+SUBNET=$(ip a | grep dynamic | cut -d " " -f8)
+if [[ $SUBNET = 192.168.1.255 ]];then
+SUBNET=192.168.1.1
+else
+SUBNET=192.168.0.1
+fi
+echo -e "Please wait..will take a min..!"
+echo -e "\033[32m"
+nmap $SUBNET-254 -F -r -vv
+echo -e "\033[00m"
+sleep 6
+echo -e "\e[91m"
+diff <(arp -n | awk '{print $3}') $TRUSTED | grep "<"
+diff <(arp -n | awk '{print $3}') $TRUSTED | grep "<" > untrust
+cat untrust | cut -d " " -f2 > untrustmac
+echo -e "\e[00m"
+echo "Note the above MAC's are untrusted! they will be attacked!!"
+echo
+echo  "Run enforcer or enforce4all:?"
+echo
+echo -e "\033[34menforcer\e[00m= Uses a time script!"
+echo
+echo -e "\033[34menforce4all\033[00m= No time script! just a one time"
+echo  "mass-deauthentication on all" 
+echo  "unknown clients/macs at the same time!"
+echo
+read -p "1=enforcer 2=enforce4all (1 or 2) "
+echo
 case $REPLY in
-#1) WiFi24GHz;;
-2) WiFi5 ;;
-""|" ") DEFAULT;;
+2)
+#if [[ $REPLY = 2 ]]; then
+while true; do
+echo -e "Recommended 21 and up!"
+read -p "Deauth Count:? " COUNT
+if [[ $COUNT = 0 ]]; then
+COUNT=COUNT
+elif [[ $COUNT = 1 ]]; then
+COUNT=COUNT
+elif [[ $COUNT = 2 ]]; then
+COUNT=COUNT
+elif [[ $COUNT = 10 ]]; then
+COUNT=COUNT
+elif [[ $COUNT = 11 ]]; then
+COUNT=COUNT
+elif [[ $COUNT = 20 ]]; then
+COUNT=COUNT
+fi
+sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/$MYBSSID/" enforcer.sh enforce4all.sh
+sed -i "s/COUNT/$COUNT/" enforce4all.sh
+exec xterm -iconic -e sudo airodump-ng -c $CH $wlan0 &
+sleep .5
+kill $!
+sudo ./enforce4all.sh
+sed -i "s/$COUNT/COUNT/" enforce4all.sh
+sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/00:00:00:00:00:00/" enforcer.sh enforce4all.sh
+echo "Press Enter to re-execute enforce4all."
+echo -e "Or 1 to run enforcer \e[91mq=quit!\e[00m: " 
+read OPTION
+clear
+case $OPTION in
+1) enforcer;;
+q|Q) sudo airmon-ng stop $wlan0 2>&1> /dev/null;exit 1;;
+#*) echo "";;
 esac
-done
-
+done;;
+#else
+1) enforcer ;;
+esac
