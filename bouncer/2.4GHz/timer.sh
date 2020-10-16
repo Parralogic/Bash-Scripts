@@ -9,8 +9,8 @@ wlan0=$(ip a | grep mon | head -1 | cut -d ":" -f 2)
 wifi=$(ip a | grep mon | head -1 | cut -d ":" -f 2)
 until [[ $TIME = 0 ]]; do
 echo -en "$TIME\\"
-TIME=$((TIME-1))
 sleep 1
+TIME=$((TIME-1))
 done
 
 if [[ $? = 0 ]];then

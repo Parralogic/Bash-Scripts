@@ -30,14 +30,14 @@ STOPTIME=$(( 60 * $STOPm ))
 fi
 sed -i "s|FILE|$TRUSTED|" enforcer.sh
 sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/$MYBSSID/" enforcer.sh enforce4all.sh
-sed -i "s/time/$STOPTIME/" timer.sh
+sed -i "s/time/$STOPTIME/" timer.sh               #Area to fix time!
 exec sudo xterm -geometry 60x2 -e ./timer.sh &
 #fi
 while true; do
 for mac in $(diff <(arp -n | awk '{print $3}') $TRUSTED | grep "<"); do
 if [[ $mac = HWaddress ]]; then
 echo "";clear
-elif [[ $mac = "<" ]]; then
+elif [[ $mac = "<" ]]; then                       #Area to fix time!
 echo "";clear
 elif [[ $mac = enp* ]];then
 sed -i "s/$STOPTIME/time/" timer.sh;clear
@@ -52,7 +52,7 @@ sudo xterm -e ./enforcer.sh &
 PID=$!
 sleep $TIME
 kill $PID
-sed -i "s/$STOPTIME/time/" timer.sh
+sed -i "s/$STOPTIME/time/" timer.sh               #Area to fix time!
 fi
 done
 done
@@ -123,7 +123,9 @@ sudo ip link set $wlan0 up 2>&1> /dev/null
 exec xterm -hold -e sudo airodump-ng $wlan0 &
 PID=$!
 echo -e "\e[33mWarning!\e[00m must use proper MAC address format: \e[5m00:00:00:00:00:00\e[00m!"
-echo -e "OR enforcer/enforce4all will break!\n"
+echo -e "OR enforcer/enforce4all will break! Take note of the numbers used on the mac address.."
+echo "Example: AA:BB:10:20:EE:60, do not use 10,20,or 60 as deauth count!" 
+echo -e "just to make sure nothing breaks.\n"
 read -p "What's your Router/AP WiFi Channel:? " CH
 read -p "What's your Router/AP BSSID MAC Address:? " MYBSSID
 sleep 2
@@ -188,7 +190,9 @@ case $REPLY in
 2)
 #if [[ $REPLY = 2 ]]; then
 while true; do
-echo -e "Recommended 21 and up!"
+echo -e "Your MAC Address: $MYBSSID"
+echo -e "Example: AA:BB:10:20:EE:60, do not use 10,20,or 60.."
+echo -e "as deauth count! just to make sure nothing breaks."
 read -p "Deauth Count:? " COUNT
 if [[ $COUNT = 0 ]]; then
 COUNT=COUNT
