@@ -67,7 +67,7 @@ fi
     
     enforce4all () {
     cat untrustmac | tail -n -$actual -f | while read mac; do 
-    exec sudo xterm -e aireplay-ng --deauth COUNT -a $MYBSSID -c $mac $wlan0 &
+    exec sudo xterm -e aireplay-ng --deauth COUNT  -a $MYBSSID -c $mac $wlan0 &
     done
     }
 wlan0=$(ip a | grep mon | head -1 | cut -d ":" -f 2)

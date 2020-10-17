@@ -1,7 +1,7 @@
 #!/bin/bash
 #Creator: David Parra-Sandoval
 #Date: 10/10/2020
-#Last Modified: 10/15/2020
+#Last Modified: 10/16/2020
 clear
 
     enforcer () {
@@ -36,11 +36,11 @@ exec sudo xterm -geometry 60x2 -e ./timer.sh &
 while true; do
 for mac in $(diff <(arp -n | awk '{print $3}') $TRUSTED | grep "<"); do
 if [[ $mac = HWaddress ]]; then
-echo "";clear
+sed -i "s/$STOPTIME/$STOPTIME/" timer.sh
 elif [[ $mac = "<" ]]; then                       #Area to fix time!
-echo "";clear
+sed -i "s/$STOPTIME/$STOPTIME/" timer.sh
 elif [[ $mac = enp* ]];then
-sed -i "s/$STOPTIME/time/" timer.sh;clear
+sed -i "s/$STOPTIME/$STOPTIME/" timer.sh
 else
 echo $mac
 echo "Because the above MAC is not trusted enforcer will;" 
@@ -51,8 +51,8 @@ echo "You do the math" #remember ;)
 sudo xterm -e ./enforcer.sh &
 PID=$!
 sleep $TIME
-kill $PID
-sed -i "s/$STOPTIME/time/" timer.sh               #Area to fix time!
+kill $PID 2>&1> /dev/null
+sed -i "s/$STOPTIME/time/" timer.sh  #enforcer.sh             #Area to fix time!
 fi
 done
 done
@@ -206,6 +206,7 @@ elif [[ $COUNT = 11 ]]; then
 COUNT=COUNT
 elif [[ $COUNT = 20 ]]; then
 COUNT=COUNT
+clear
 fi
 sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/$MYBSSID/" enforcer.sh enforce4all.sh
 sed -i "s/COUNT/$COUNT/" enforce4all.sh
