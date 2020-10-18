@@ -14,9 +14,10 @@ TIME=$((TIME-1))
 done
 
 if [[ $? = 0 ]];then
-sed -i "s|/[a-z|A-Z]*/[a-z|A-Z]*/[a-z|A-Z]*|FILE|" enforcer.sh
 sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/00:00:00:00:00:00/" enforcer.sh enforce4all.sh
-#./resetTIMER.sh
+echo -e "\e[91m"
+rm -i attack realattack validate
+echo -e "\e[00m"
 sudo airmon-ng stop $wlan0 2>&1> /dev/null
 sudo ip link set $wifi down 2>&1> /dev/null
 sudo ip link set $wifi up 2>&1> /dev/null

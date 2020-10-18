@@ -1,9 +1,22 @@
 #!/bin/bash
 #Creator: David Parra-Sandoval
 #Date: 10/10/2020
-#Last Modified: 10/16/2020
+#Last Modified: 10/18/2020
 clear
 
+    validate () {
+    for trust in $(cat validate); do
+echo -e "\e[92mValidating $trust\e[00m"
+for untrust in $(cat $TRUSTED); do
+if [[ $untrust = $trust ]]; then
+[[ $untrust != $trust ]]
+echo $trust >> attack
+fi
+done 
+done
+diff validate attack | grep "<" > realattack
+echo "< HWaddress" >> realattack
+}
     enforcer () {
 exec xterm -iconic -e sudo airodump-ng -c $CH $wlan0 &
 sleep .5
@@ -28,18 +41,15 @@ else
 read -p "enforcer will keep running for # min:? " STOPm
 STOPTIME=$(( 60 * $STOPm ))
 fi
-sed -i "s|FILE|$TRUSTED|" enforcer.sh
 sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/$MYBSSID/" enforcer.sh enforce4all.sh
 sed -i "s/time/$STOPTIME/" timer.sh               #Area to fix time!
 exec sudo xterm -geometry 60x2 -e ./timer.sh &
 #fi
 while true; do
-for mac in $(diff <(arp -n | awk '{print $3}') $TRUSTED | grep "<"); do
+for mac in $(cat realattack | awk '{print $2}'); do               
 if [[ $mac = HWaddress ]]; then
 sed -i "s/$STOPTIME/$STOPTIME/" timer.sh
 elif [[ $mac = "<" ]]; then                       #Area to fix time!
-sed -i "s/$STOPTIME/$STOPTIME/" timer.sh
-elif [[ $mac = enp* ]];then
 sed -i "s/$STOPTIME/$STOPTIME/" timer.sh
 else
 echo $mac
@@ -51,8 +61,8 @@ echo "You do the math" #remember ;)
 sudo xterm -e ./enforcer.sh &
 PID=$!
 sleep $TIME
-kill $PID 2>&1> /dev/null
-sed -i "s/$STOPTIME/time/" timer.sh  #enforcer.sh             #Area to fix time!
+kill $PID 
+sed -i "s/$STOPTIME/time/" timer.sh              #Area to fix time!
 fi
 done
 done
@@ -72,34 +82,29 @@ echo "Or will not work correctly!!"
 fi
 done
 echo
+while true; do
 echo "You need two WiFi adapters one that can"
 echo "be put in monitor mode with packet injection,"
 echo "and the other connected to your WiFi OR"
 echo "One WiFi adapter with monitor & packet injection"
 echo "while connected to your router using ethernet."
 read -p "Do you meet the requirements:?(y/n) "
-if [[ $REPLY = [nN]* ]];then
-exit 1
-fi
-    macfile () {
-    while true; do
-    read -p "Full path of trusted MAC file:?" TRUSTED
-    if [[ -f $TRUSTED  ]];then
-    break
-    fi
-    done
-    }
+clear
+ case $REPLY in
+ y|Y) break;;
+ n|N) exit 1;;
+ *) echo "";;
+ esac
+ done
 echo
 echo "This script will auto disconnect/deauthenticate:"
 echo "Unknown wireless clients from your wireless network"
-echo "Provided with a list of accepted MAC addresses"
-read -p "Full path of trusted MAC file:?" TRUSTED
-if [[ -f $TRUSTED ]];then
-echo -e "\e[92m$TRUSTED\e[00m will be used to filter out unknown MAC's"
-else
-echo -e "\e[91m$TRUSTED\e[00m does not exist!"
-macfile
-fi
+echo "Select the list of accepted MAC addresses"
+select MACLIST in $(find MAC -type f ! -name ".validate.sh"); do
+TRUSTED=$MACLIST 
+echo -e "\e[92m$MACLIST\e[00m will be used to filter out unknown MAC's"
+break
+done
 echo
 echo  "Xterm will open to gather info"
 echo  "about your Router/AP"
@@ -137,8 +142,6 @@ else
 SUBNET=192.168.0.1
 fi
 echo "Please wait..gathering info about your network:" 
-arp -n 2>&1> /dev/null
-arp -n 2>&1> /dev/null
 arp -a 2>&1> /dev/null
 sleep 2
 GATEWAY_MAC=$(arp -a | grep "$SUBNET" | grep gateway | cut -d " " -f4)
@@ -150,9 +153,9 @@ echo  "Note your Router/AP MAC will differ from AP/BSSID"
 echo  "This script will use nmap to scan your network"
 echo  "and populate the arp table with mac addresses,"
 echo  "then aireplay-ng will use the generated mac list using"
-echo  "arp -a [net-tools package] in conjunction with diff to identify" 
-echo  "the differences in macs to deauthenticate"
-echo  "based on the trusted mac list provided!"
+echo  "arp -a [net-tools package] in conjunction with diff/validate" 
+echo  "to identify the differences in macs to deauthenticate"
+echo  "based on the trusted mac list selected!"
 echo
 echo -e "Subnet:\e[92m$SUBNET\e[00m"
 echo -e "Router/AP:\e[92m$GATEWAY_MAC\e[00m" 
@@ -169,11 +172,14 @@ echo -e "\033[32m"
 nmap $SUBNET-254 -F -r -vv
 echo -e "\033[00m"
 sleep 6
+arp -n 
+echo
+arp -a | awk '{print $4}' > validate
+validate
 echo -e "\e[91m"
-diff <(arp -n | awk '{print $3}') $TRUSTED | grep "<"
-diff <(arp -n | awk '{print $3}') $TRUSTED | grep "<" > untrust
-cat untrust | cut -d " " -f2 > untrustmac
+cat realattack
 echo -e "\e[00m"
+echo 
 echo "Note the above MAC's are untrusted! they will be attacked!!"
 echo
 echo  "Run enforcer or enforce4all:?"
@@ -188,7 +194,6 @@ read -p "1=enforcer 2=enforce4all (1 or 2) "
 echo
 case $REPLY in
 2)
-#if [[ $REPLY = 2 ]]; then
 while true; do
 echo -e "Your MAC Address: $MYBSSID"
 echo -e "Example: AA:BB:10:20:EE:60, do not use 10,20,or 60.."
@@ -226,6 +231,5 @@ q|Q) sudo airmon-ng stop $wlan0 2>&1> /dev/null;exit 1;;
 #*) echo "";;
 esac
 done;;
-#else
 1) enforcer ;;
 esac
