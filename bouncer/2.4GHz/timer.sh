@@ -24,5 +24,6 @@ sudo ip link set $wifi up 2>&1> /dev/null
 sudo killall bouncer.sh
 sudo killall xterm
 sudo killall sleep
+killall file.so
 fi
 

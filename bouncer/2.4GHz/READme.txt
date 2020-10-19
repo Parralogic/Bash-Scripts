@@ -12,5 +12,6 @@ the files created by diff/validate!!!
 it is safe to delete all 3 files, the only file that might be 
 important is the realattack file which includes the "unknown" mac addresses!
 
-
+If no Unknown MAC addresses are found then your wifi/system will
+revert back to its original functionality.
 

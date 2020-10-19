@@ -102,8 +102,13 @@ echo "Unknown wireless clients from your wireless network"
 echo "Select the list of accepted MAC addresses"
 select MACLIST in $(find MAC -type f ! -name ".validate.sh"); do
 TRUSTED=$MACLIST 
-echo -e "\e[92m$MACLIST\e[00m will be used to filter out unknown MAC's"
-break
+echo -e "\e[92m$MACLIST\e[00m will be used to filter out unknown MAC's?(y/n)"
+read YESNO
+case $YESNO in
+y|Y) break;;
+n|N) echo Re-select:;;
+*) echo Not a valid choice!;;
+esac
 done
 echo
 echo  "Xterm will open to gather info"
@@ -128,7 +133,8 @@ sudo ip link set $wlan0 up 2>&1> /dev/null
 exec xterm -hold -e sudo airodump-ng $wlan0 &
 PID=$!
 echo -e "\e[33mWarning!\e[00m must use proper MAC address format: \e[5m00:00:00:00:00:00\e[00m!"
-echo -e "OR enforcer/enforce4all will break! Take note of the numbers used on the mac address.."
+echo -e "OR enforcer/enforce4all will break! Take note of the numbers used on the" 
+echo -e "mac address.."
 echo "Example: AA:BB:10:20:EE:60, do not use 10,20,or 60 as deauth count!" 
 echo -e "just to make sure nothing breaks.\n"
 read -p "What's your Router/AP WiFi Channel:? " CH
@@ -179,6 +185,15 @@ validate
 echo -e "\e[91m"
 cat realattack
 echo -e "\e[00m"
+if [[ $(cat realattack | awk '{print $2}') = HWaddress ]] && [[ $(cat realattack | cut -d " " -f 2) = HWaddress ]]; then
+echo -e "\e[92mGREAT!!\e[00m no Unknown MAC addresses"
+echo "Nothing to do..All is good!"
+read -p "Press Enter to reset Network adapters to revert back to normal"
+case $REPLY in
+""|" ") sudo airmon-ng stop $wlan0 && sudo ip link set $ADAPTER down && sudo ip link set $ADAPTER up && rm  attack realattack validate;clear; exit 1;;
+*) sudo airmon-ng stop $wlan0 && sudo ip link set $ADAPTER down && sudo ip link set $ADAPTER up && rm  attack realattack validate;clear; exit 1;;
+esac
+fi
 echo 
 echo "Note the above MAC's are untrusted! they will be attacked!!"
 echo
@@ -227,7 +242,7 @@ read OPTION
 clear
 case $OPTION in
 1) enforcer;;
-q|Q) sudo airmon-ng stop $wlan0 2>&1> /dev/null;exit 1;;
+q|Q) sudo airmon-ng stop $wlan0 && sudo ip link set $ADAPTER down && sudo ip link set $ADAPTER up && rm  attack realattack validate;clear; exit 1;;
 #*) echo "";;
 esac
 done;;
