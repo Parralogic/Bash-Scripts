@@ -14,6 +14,7 @@ TIME=$((TIME-1))
 done
 
 if [[ $? = 0 ]];then
+tput bel
 sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/00:00:00:00:00:00/" enforcer.sh enforce4all.sh
 echo -e "\e[91m"
 rm -i attack realattack validate
