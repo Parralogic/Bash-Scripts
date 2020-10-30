@@ -15,3 +15,7 @@ important is the realattack file which includes the "unknown" mac addresses!
 If no Unknown MAC addresses are found then your wifi/system will
 revert back to its original functionality.
 
+UPDATE 10/30/2020
+enforcer will revalidate mac addresses, so if a new unknown mac joins your network
+it will be detected and deauthenticated. #minor change#
+

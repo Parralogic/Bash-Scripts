@@ -1,10 +1,11 @@
 #!/bin/bash
 #Creator: David Parra-Sandoval
 #Date: 10/10/2020
-#Last Modified: 10/18/2020
+#Last Modified: 10/30/2020
 clear
 
     validate () {
+    arp -a | awk '{print $4}' > validate
     for trust in $(cat validate); do
 echo -e "\e[92mValidating $trust\e[00m"
 for untrust in $(cat $TRUSTED); do
@@ -52,7 +53,8 @@ sed -i "s/$STOPTIME/$STOPTIME/" timer.sh
 elif [[ $mac = "<" ]]; then                       #Area to fix time!
 sed -i "s/$STOPTIME/$STOPTIME/" timer.sh
 else
-echo $mac
+validate
+echo -e "\e[5;91m$mac\e[00m < Not Trusted!"
 echo "Because the above MAC is not trusted enforcer will;" 
 echo "disconnect all untrust MAC's! One by One." 
 echo "enforcer will run every $TIME sec"
@@ -180,7 +182,7 @@ echo -e "\033[00m"
 sleep 6
 arp -n 
 echo
-arp -a | awk '{print $4}' > validate
+#arp -a | awk '{print $4}' > validate
 validate
 echo -e "\e[91m"
 cat realattack
