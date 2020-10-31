@@ -18,4 +18,6 @@ revert back to its original functionality.
 UPDATE 10/30/2020
 enforcer will revalidate mac addresses, so if a new unknown mac joins your network
 it will be detected and deauthenticated. #minor change#
+Also if you see <incomplete> during validation, no worries will not effect anything,
+just a buffer/glitch in arp.
 

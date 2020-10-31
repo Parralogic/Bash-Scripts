@@ -11,7 +11,7 @@ echo -e "\e[92mValidating $trust\e[00m"
 for untrust in $(cat $TRUSTED); do
 if [[ $untrust = $trust ]]; then
 [[ $untrust != $trust ]]
-echo $trust >> attack
+echo $trust > attack
 fi
 done 
 done
@@ -52,6 +52,8 @@ if [[ $mac = HWaddress ]]; then
 sed -i "s/$STOPTIME/$STOPTIME/" timer.sh
 elif [[ $mac = "<" ]]; then                       #Area to fix time!
 sed -i "s/$STOPTIME/$STOPTIME/" timer.sh
+elif [[ $mac = "<incomplete>" ]]; then
+echo ""
 else
 validate
 echo -e "\e[5;91m$mac\e[00m < Not Trusted!"
@@ -63,7 +65,8 @@ echo "You do the math" #remember ;)
 sudo xterm -e ./enforcer.sh &
 PID=$!
 sleep $TIME
-kill $PID 
+kill $PID
+unset PID
 sed -i "s/$STOPTIME/time/" timer.sh              #Area to fix time!
 fi
 done
