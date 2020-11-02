@@ -66,7 +66,7 @@ fi
     
     
     enforce4all () {
-    cat realattack | cut -d "<" -f 2 | while read mac; do 
+    cat realattack | cut -d "<" -f 2 | while read mac; do
     exec sudo xterm -e aireplay-ng --deauth COUNT  -a $MYBSSID -c $mac $wlan0 &
     done
     }

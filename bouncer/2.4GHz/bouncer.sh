@@ -1,7 +1,7 @@
 #!/bin/bash
 #Creator: David Parra-Sandoval
 #Date: 10/10/2020
-#Last Modified: 10/30/2020
+#Last Modified: 11/01/2020
 clear
 
     validate () {
@@ -11,7 +11,7 @@ echo -e "\e[92mValidating $trust\e[00m"
 for untrust in $(cat $TRUSTED); do
 if [[ $untrust = $trust ]]; then
 [[ $untrust != $trust ]]
-echo $trust > attack
+echo $trust >> attack
 fi
 done 
 done
@@ -45,13 +45,13 @@ fi
 sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/$MYBSSID/" enforcer.sh enforce4all.sh
 sed -i "s/time/$STOPTIME/" timer.sh               #Area to fix time!
 exec sudo xterm -geometry 60x2 -e ./timer.sh &
-#fi
+sleep .5
 while true; do
-for mac in $(cat realattack | awk '{print $2}'); do               
+for mac in $(cat realattack); do               
 if [[ $mac = HWaddress ]]; then
-sed -i "s/$STOPTIME/$STOPTIME/" timer.sh
+sed -i "s/91m/94m/" enforcer.sh
 elif [[ $mac = "<" ]]; then                       #Area to fix time!
-sed -i "s/$STOPTIME/$STOPTIME/" timer.sh
+sed -i "s/94m/91m/" enforcer.sh
 elif [[ $mac = "<incomplete>" ]]; then
 echo ""
 else
@@ -231,8 +231,8 @@ elif [[ $COUNT = 11 ]]; then
 COUNT=COUNT
 elif [[ $COUNT = 20 ]]; then
 COUNT=COUNT
-clear
 fi
+clear
 sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/$MYBSSID/" enforcer.sh enforce4all.sh
 sed -i "s/COUNT/$COUNT/" enforce4all.sh
 exec xterm -iconic -e sudo airodump-ng -c $CH $wlan0 &

