@@ -3,10 +3,25 @@
 #extension for bouncer!/5GHz
 #TIMER
  
- 
-TIME="time"
+
 wlan0=$(ip a | grep mon | head -1 | cut -d ":" -f 2)
-wifi=$(ip a | grep mon | head -1 | cut -d ":" -f 2)
+wifi=$(ip a | grep wl | head -1 | cut -d ":" -f 2)
+
+EXIT () {
+echo -e "\e[92m"
+airmon-ng stop $wlan0
+sleep 2
+ip link set $wifi down && ip link set $wifi up
+sleep 1
+killall sleep
+killall file.so
+killall aireplay-ng
+killall xterm
+echo -e "\e[00m"
+}
+
+TIME="time"
+
 until [[ $TIME = 0 ]]; do
 echo -en "\e[92m$TIME\e[0m\\"
 sleep 1
@@ -16,15 +31,13 @@ done
 if [[ $? = 0 ]];then
 tput bel
 echo -e "\e[91m"
-sudo killall bouncer5GHz.sh
-rm realattack 5ghzstations-01.csv
-sudo airmon-ng stop $wlan0 
-sudo ip link set $wifi 
-sudo ip link set $wifi
-sudo killall xterm
-sudo killall sleep
-killall file.so
-PID=$(ps -e | grep aireplay-ng | cut -d " " -f 3)
-sudo kill $PID
+killall bouncer5GHz.sh
+rm realattack 5ghzstations-01.csv validate
 echo -e "\e[00m"
 fi
+echo "Attack Finished! Launch bouncer5GHz.sh again:?"
+read -p "PRESS ENTER or ANY KEY then ENTER to EXIT "
+case $REPLY in
+""|" ") sudo ./bouncer5GHz.sh ;;
+*) EXIT ;;
+esac
