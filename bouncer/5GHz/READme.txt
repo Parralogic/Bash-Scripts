@@ -1,5 +1,5 @@
 UPDATE! 11/05/2020
-tested working under archbang linux 0111, thanx to Mrgreen!.
+tested working under archbang linux 0111, thanx to MrGreen!.
 bouncer5GHz will deauth all unknown 5GHz clients connected to your
 network @ the "same time".
 Starting the timer requires you to press enter;
