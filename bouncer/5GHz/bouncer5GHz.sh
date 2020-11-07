@@ -1,7 +1,7 @@
 #!/bin/bash
 #Creator: David Parra-Sandoval
 #created: 10/21/2020
-#Last modified: 11/05/2020
+#Last modified: 11/06/2020
 clear
 #cd /home/david/Templates/Bash-Scripts/bouncer/5GHz
 if [[ ${UID} -ne 0 ]]; then
