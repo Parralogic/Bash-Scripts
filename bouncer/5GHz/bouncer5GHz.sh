@@ -3,7 +3,7 @@
 #created: 10/21/2020
 #Last modified: 11/06/2020
 clear
-#cd /home/david/Templates/Bash-Scripts/bouncer/5GHz
+cd /home/david/Templates/Bash-Scripts/bouncer/5GHz
 if [[ ${UID} -ne 0 ]]; then
 exit 1
 fi
@@ -272,6 +272,24 @@ fi
 done
  }
 
+ 	MYINFO () {
+ echo "Xterm will launch to input your AP/router info"
+read -p "PRESS ENTER"
+exec xterm -e sudo airodump-ng --band a $mon0 &
+sleep 1
+clear
+PID1=$(ps -e | grep airodump-ng | cut -d " " -f 3)
+until [[ $INFO = [yY]* ]]; do
+read -p "Whats your BSSID: " MYBSSID
+echo $MYBSSID > mybssid
+read -p "Whats your CH: " CH
+echo $CH > mychannel
+read -p "Is this correct?: [y/n] " INFO
+clear
+done
+killall airodump-ng  ##PID1
+}
+ 
  if [[ -f $(find MAC/ -type f) ]]; then
 	echo ""
 	else
@@ -310,23 +328,9 @@ sudo macchanger -A $mon0
 sudo ip link set $mon0 up
 clear
 if [[ ! -f mybssid ]]; then
-echo "Xterm will launch to input your AP/router info"
-read -p "PRESS ENTER"
-exec xterm -e sudo airodump-ng --band a $mon0 &
-sleep 1
+MYINFO
+fi
 clear
-PID1=$(ps -e | grep airodump-ng | cut -d " " -f 3)
-until [[ $INFO = [yY]* ]]; do
-read -p "Whats your BSSID: " MYBSSID
-echo $MYBSSID > mybssid
-read -p "Whats your CH: " CH
-echo $CH > mychannel
-read -p "Is this correct?: [y/n] " INFO
-clear
-done
-killall airodump-ng  ##PID1
-clear
-else
 echo "Second select the MAC Address list to filter"
 echo "out the unknown MACs."
 echo
@@ -341,7 +345,6 @@ n|N) echo "re-select:" ;;
 *) echo "Only y,Y,n,N:re-select:" ;;
 esac
 done
-fi
 CH=$(cat mychannel)
 MYBSSID=$(cat mybssid)
 clear
