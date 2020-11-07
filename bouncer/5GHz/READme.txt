@@ -5,6 +5,9 @@ it will not ask you to obtain the info via launching an xterm session
 with airodump-ng. ##just delete the files "mybssid/mychannel" to get that prompt back##
 Bouncer5Ghz will detect that your wifi card is in monitor mode and
 will bypass un-needed info input/..and just some minor changes! ;)
+**Please open bouncer5GHz.sh in a text editor and add "#" in the beginning of the 6th line or delete the 6th line out
+containing my working directory for bouncer5GHz, for the script to work properly.
+cd /home/david/Templates/Bash-Scripts/bouncer/5GHz to #cd /home/david/Templates/Bash-Scripts/bouncer/5GHz
 
 UPDATE! 11/05/2020
 tested working under archbang linux 0111, thanx to MrGreen!.

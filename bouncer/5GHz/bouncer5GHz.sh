@@ -3,8 +3,7 @@
 #created: 10/21/2020
 #Last modified: 11/06/2020
 clear
-#cd /home/david/Templates/Bash-Scripts/bouncer/5GHz
-cd $PWD
+cd /home/david/Templates/Bash-Scripts/bouncer/5GHz
 if [[ ${UID} -ne 0 ]]; then
 exit 1
 fi
