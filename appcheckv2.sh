@@ -5,7 +5,7 @@
 clear
 
 if [[ -z $@ ]]; then
-echo "No application to check."
+echo "No application to check.."
 echo Usage: $0 appname appname appname etc..
 exit 1
 fi
