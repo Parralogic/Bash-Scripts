@@ -35,8 +35,9 @@ killall bouncer5GHz.sh
 rm realattack 5ghzstations-01.csv validate
 echo -e "\e[00m"
 fi
-echo "Attack Finished! Launch bouncer5GHz.sh again:?"
-read -p "PRESS ENTER or ANY KEY then ENTER to EXIT "
+echo "Attack Finished!"
+echo "Launch bouncer5GHz.sh again:? PRESS ENTER"
+read -p "[e] KEY then ENTER to Exit! "
 case $REPLY in
 ""|" ") sudo ./bouncer5GHz.sh ;;
 *) EXIT ;;

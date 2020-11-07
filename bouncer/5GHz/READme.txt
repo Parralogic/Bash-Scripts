@@ -1,3 +1,11 @@
+UPDATE! 11/06/2020
+After inputing your router info, bouncer5GHz will create
+a "mybssid and mychannel" files so next time you run the script
+it will not ask you to obtain the info via launching an xterm session
+with airodump-ng. ##just delete the files "mybssid/mychannel" to get that prompt back##
+Bouncer5Ghz will detect that your wifi card is in monitor mode and
+will bypass un-needed info input/..and just some minor changes! ;)
+
 UPDATE! 11/05/2020
 tested working under archbang linux 0111, thanx to MrGreen!.
 bouncer5GHz will deauth all unknown 5GHz clients connected to your
