@@ -88,7 +88,9 @@ n|N) echo "Please re-select:" ;;
 esac
 done
 clear
-echo "Lets gather the necessery info about your AP/Router:"
+MYINFO () {
+	local PS3="List? "
+echo "Lets gather the necessary info about your AP/Router:"
 read -p "Press Enter"
 xterm -e sudo airodump-ng --band abg $mon5ghz &
 until [[ $REPLY = [yY]* ]]; do
@@ -102,7 +104,33 @@ echo
 echo "My Info:"
 echo -e "2.4GHz= $BSSID24 CH= $CH24\n"
 echo -e "5GHz= $BSSID5 CH= $CH5\n"
-read -p "Is the info correct:? "
+read -p "Is the info correct:? [y/n] "
 done
 killall airodump-ng
-
+clear
+echo "Now lets select the trusted MAC address list for 2.4GHz:"
+select list24 in $(find MAC2.4ghz -type f ); do
+	TRUST24=$list24
+cat $TRUST24
+echo
+read -p "Use the above list:? [y/n] "
+case $REPLY in
+y|Y) echo "Great!";sleep 2; break ;;
+n|N) echo "re-select:" ;;
+*) echo "" ;;
+esac
+done
+echo "Now select the trusted MAC address list for 5GHz:"
+select list5 in $(find MAC5ghz -type f ); do
+	TRUST5=$list5
+cat $TRUST5
+echo
+read -p "Use the above list:? [y/n] "
+case $REPLY in
+y|Y) echo "Great!";sleep 2; break ;;
+n|N) echo "re-select:" ;;
+*) echo "" ;;
+esac
+done
+}
+MYINFO
