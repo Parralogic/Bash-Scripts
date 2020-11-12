@@ -85,8 +85,8 @@ echo "In order for this script to work properly it requires:"
 echo "Two WiFi adapters that are capable of packet injection"
 echo "and one WiFi adapter connected to your WiFi AP/Router"
 echo "or utilizing ethernet. Note! the obvious is having.."
-echo "the two WiFi adapter to One being able to access the 5GHz"
-echo "band."
+echo "the two WiFi adapter with packet injection to One being"
+echo "able to access the 5GHz band."
 echo
 echo "RECAP:SETUP="
 echo "3 WiFi adapters= 1 connected to your AP/Router.               "
@@ -120,6 +120,7 @@ case $NIC in
 y|Y) echo "Great! $NIC24 will be used"; sleep 2
 echo "Now putting $NIC24 in monitor mode"; sleep 1
 sudo airmon-ng start $NIC24 &> /dev/null
+echo
 ip a | grep mon
 echo
 read -p "Input the 2.4GHzmon Name:? " mon24ghz
@@ -143,6 +144,7 @@ case $NIC in
 y|Y) echo "Great! $NIC5 will be used"; sleep 2
 echo "Now putting $NIC5 in monitor mode"; sleep 1
 sudo airmon-ng start $NIC5 &> /dev/null
+echo
 ip a | grep mon
 echo
 echo "Your 2.4GHz is: $mon24ghz"
@@ -158,7 +160,8 @@ clear
 	MYINFO () {
 	local PS3="List? "
 echo "Lets gather the necessary info about your AP/Router:"
-echo "Remember press spacebar to pause, dont close any terminal/will close after info input."
+echo -e "Remember press \e[91mSPACEBAR\e[00m to pause airodump-ng."
+echo "Dont close any terminal/Auto close after info input is gathered."
 read -p "Press Enter"
 until [[ $REPLY = [yY]* ]]; do
 clear
@@ -175,11 +178,10 @@ echo -e "2.4GHz= $BSSID24 CH= $CH24\n"
 echo -e "5GHz= $BSSID5 CH= $CH5\n"
 read -p "Is the info correct:? [y/n] "
 done
-sed -i "s|[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*|$BSSID5" enforcer5GHz.sh					
+sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/$BSSID5/" enforcer5GHz.sh					
 sed -i "s/adapter/$mon5ghz/" enforcer5GHz.sh
-sed -i "s|[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*|$BSSID24" enforcer2.4GHz.sh					
+sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/$BSSID24/" enforcer2.4GHz.sh					
 sed -i "s/adapter/$mon24ghz/" enforcer2.4GHz.sh
-sleep 2
 killall airodump-ng
 xterm -e sudo airodump-ng -c $CH24 --bssid $BSSID24 $mon24ghz &
 xterm -e sudo airodump-ng -c $CH5 --bssid $BSSID5 $mon5ghz & 
@@ -198,6 +200,7 @@ n|N) echo "re-select:" ;;
 *) echo "" ;;
 esac
 done
+echo -e "\n"
 echo "Now select the trusted MAC address list for 5GHz:"
 select list5 in $(find MAC5ghz -type f ); do
 	TRUST5=$list5
@@ -224,25 +227,24 @@ if [[ $? -ne 0 ]]; then
 fi
 sleep 2
 clear
-ip neighbour
 echo
-echo "The above results acquired with nmap/ip neighbour"
-echo "demonstrates the ARP table cache."
-echo "These results will also be used in conjunction with the trusted list."
-read -p "Press Enter"
+curl ifconfig.me; echo
+echo -e "$router"
+echo 
+read -t 2 -p "Press Enter"
 clear
 	
 	validate () {
 xterm -e airodump-ng -c $CH24 --bssid $BSSID24 --output-format csv -w ACTUALSTATIONS24 $mon24ghz | xterm -e airodump-ng -c $CH5 --bssid $BSSID5 --output-format csv -w ACTUALSTATIONS5 $mon5ghz &
-sleep 20
+sleep 16
 killall airodump-ng
 MACS=$(wc -l ACTUALSTATIONS24-01.csv | cut -d " " -f1)
 MACSactual=$(($MACS - 5 ))
 
 echo "Now validating 2.4GHz"
- cat ACTUALSTATIONS24-01.csv | awk -F "," '{print $1}'| tail -$MACSactual > validate
- sleep 2
- for trust in $(cat validate); do
+cat ACTUALSTATIONS24-01.csv | awk -F "," '{print $1}'| tail -$MACSactual > validate
+sleep .5
+for trust in $(cat validate); do
 if [[ $trust = " " ]];then
 echo ""
 else
@@ -257,12 +259,12 @@ echo -e "\e[91m"
 cat realattack
 echo -e "\e[00m"
 echo
- echo "Now validating 5GHz"
- MACS=$(wc -l ACTUALSTATIONS5-01.csv | cut -d " " -f1)
- MACSactual=$(($MACS - 5 ))
- cat ACTUALSTATIONS5-01.csv | awk -F "," '{print $1}'| tail -$MACSactual > validate5ghz
- 
- for trust in $(cat validate5ghz); do
+echo "Now validating 5GHz"
+MACS=$(wc -l ACTUALSTATIONS5-01.csv | cut -d " " -f1)
+MACSactual=$(($MACS - 5 ))
+cat ACTUALSTATIONS5-01.csv | awk -F "," '{print $1}'| tail -$MACSactual > validate5ghz
+sleep .5
+for trust in $(cat validate5ghz); do
 if [[ $trust = " " ]];then
 echo ""
 else
@@ -307,24 +309,14 @@ enforce4all5ghz
 
 	enforcer () {
 
+xterm -e ./enforcer2.4GHz.sh &
 
-
-
-echo "enforce4all"
-
-
-
-
-
-
-
-
-
+xterm -e ./enforcer5GHz.sh &
 	}
 
 until [[ $ATTACKSETUP = [yY]* ]]; do
-echo "This script has two attack functions that can be"
-echo "deployed on to your network to disconnect/deauthenticate"
+echo "This script has two attack functions that can be deployed"
+echo "on to your wireless network to disconnect/deauthenticate"
 echo "Unknown MAC Addresses."
 echo
 echo "1.) enforcer = Will execute and disconnect clients one by one."
@@ -352,7 +344,7 @@ echo
 echo "Based on the method you selected: $METHOD"
 echo "How frequently should that function be executed?"
 echo "Based on the attack duration you inputed: $TIME seconds"
-echo "Also take into account the re-validation time period of 20 seconds!"
+echo "Also take into account the re-validation time period: which varies!"
 read -p "[M/H] " mh
 case $mh in
 m|M) read -p "How many [M]inutes:? " min
@@ -365,7 +357,7 @@ esac
 echo
 echo "RECAP:"
 echo "The attack duration/prolong for $TIME seconds!"
-echo "$METHOD will execute every $ATTACK seconds! + 20 seconds"
+echo "$METHOD will execute every $ATTACK seconds! + re-validation!"
 read -p "Is this correct:? [y/n] " ATTACKSETUP
 clear
 done
@@ -393,6 +385,9 @@ for mac in $(cat realattack realattack5ghz); do
 	else
 $METHOD
 sleep $ATTACK
+rm ACTUALSTATIONS5-01.csv ACTUALSTATIONS24-01.csv
+validate
+sed -i "s/$TIME/time/" timer.sh
 fi
 done
 done
