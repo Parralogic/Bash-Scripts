@@ -1,7 +1,7 @@
 #!/bin/bash
 #Creator: David Parra-Sandoval
 #Date: 11/10/2020
-#Last Modified: 11/11/2020
+#Last Modified: 11/13/2020
 clear
 
 PS3="NIC? "
@@ -25,6 +25,15 @@ ping -c 1 $SUBNET &> /dev/null && ping -c 1 nmap.org &> /dev/null
 if [[ $? -ne 0 ]]; then
 	exit 1
 fi
+
+    CHECKMR () {
+[[ $(echo $MR | cut -d ":" -f1) = $(echo $BSSID24 | cut -d ":" -f1) ]] || exit 1
+[[ $(echo $MR | cut -d ":" -f2) = $(echo $BSSID24 | cut -d ":" -f2) ]] || exit 1
+[[ $(echo $MR | cut -d ":" -f3) = $(echo $BSSID24 | cut -d ":" -f3) ]] || exit 1
+[[ $(echo $MR | cut -d ":" -f4) = $(echo $BSSID24 | cut -d ":" -f4) ]] || exit 1
+[[ $(echo $MR | cut -d ":" -f5) = $(echo $BSSID24 | cut -d ":" -f5) ]] || exit 1
+#IPTABLES lock network traffic
+    }
 
 case $router in
 	Linksys) nmap -O $SUBNET | grep $router ; if [[ $? = 0 ]]; then 
@@ -157,6 +166,15 @@ n|N) echo "Please re-select:" ;;
 esac
 done
 clear
+    CHECKMR1 () {
+[[ $(echo $MR | cut -d ":" -f1) = $(echo $BSSID5 | cut -d ":" -f1) ]] || exit 1
+[[ $(echo $MR | cut -d ":" -f2) = $(echo $BSSID5 | cut -d ":" -f2) ]] || exit 1
+[[ $(echo $MR | cut -d ":" -f3) = $(echo $BSSID5 | cut -d ":" -f3) ]] || exit 1
+[[ $(echo $MR | cut -d ":" -f4) = $(echo $BSSID5 | cut -d ":" -f4) ]] || exit 1
+[[ $(echo $MR | cut -d ":" -f5) = $(echo $BSSID5 | cut -d ":" -f5) ]] || exit 1
+
+    }
+
 	MYINFO () {
 	local PS3="List? "
 echo "Lets gather the necessary info about your AP/Router:"
@@ -218,8 +236,10 @@ MYINFO
 #mon24ghz TRUST24 #mon5ghz TRUST5
 if [[ $(ip a | grep dynamic | cut -d " " -f 8) = 192.168.1.255 ]]; then
 	SUBNET=192.168.1.1
+     MR=$(nmap  192.168.1.1 | grep -i $router | cut -d " " -f3)
 else
 	SUBNET=192.168.0.1
+     MR=$(nmap  192.168.0.1 | grep -i $router | cut -d " " -f3)
 fi
 ping -c 1 $SUBNET &> /dev/null && ping -c 1 nmap.org &> /dev/null
 if [[ $? -ne 0 ]]; then
@@ -233,6 +253,12 @@ echo -e "$router"
 cat /etc/os-release /etc/lsb-release
 read -t 4 -p ""
 clear
+
+[[ $(echo $MR | cut -d ":" -f1) = $(echo $BSSID24 | cut -d ":" -f1) ]] || exit 1
+[[ $(echo $MR | cut -d ":" -f2) = $(echo $BSSID24 | cut -d ":" -f2) ]] || exit 1
+[[ $(echo $MR | cut -d ":" -f3) = $(echo $BSSID24 | cut -d ":" -f3) ]] || exit 1
+[[ $(echo $MR | cut -d ":" -f4) = $(echo $BSSID24 | cut -d ":" -f4) ]] || exit 1
+[[ $(echo $MR | cut -d ":" -f5) = $(echo $BSSID24 | cut -d ":" -f5) ]] || exit 1
 	
 	validate () {
 xterm -e airodump-ng -c $CH24 --bssid $BSSID24 --output-format csv -w ACTUALSTATIONS24 $mon24ghz | xterm -e airodump-ng -b a -c $CH5 --bssid $BSSID5 --output-format csv -w ACTUALSTATIONS5 $mon5ghz &
@@ -281,6 +307,11 @@ echo -e "\e[00m"
 
  }
                      
+[[ $(echo $MR | cut -d ":" -f1) = $(echo $BSSID5 | cut -d ":" -f1) ]] || exit 1
+[[ $(echo $MR | cut -d ":" -f2) = $(echo $BSSID5 | cut -d ":" -f2) ]] || exit 1
+[[ $(echo $MR | cut -d ":" -f3) = $(echo $BSSID5 | cut -d ":" -f3) ]] || exit 1
+[[ $(echo $MR | cut -d ":" -f4) = $(echo $BSSID5 | cut -d ":" -f4) ]] || exit 1
+[[ $(echo $MR | cut -d ":" -f5) = $(echo $BSSID5 | cut -d ":" -f5) ]] || exit 1
 
 	enforce4all () {
 
@@ -303,7 +334,7 @@ echo -e "\e[00m"
 
 enforce4all2.4ghz
 enforce4all5ghz
-
+CHECKMR
 
 }
 
@@ -369,6 +400,7 @@ while [[ $METHOD = enforce4all ]] ; do
 for mac in $(cat realattack realattack5ghz); do
 	if [[ $mac = "< | HWaddress" ]]; then
 		sed -i "s/time/$TIME/" timer.sh
+        CHECKMR1 && CHECKMR
 	else
 $METHOD
 sleep $ATTACK
@@ -381,7 +413,7 @@ done
 while [[ $METHOD = enforcer ]] ; do
 for mac in $(cat realattack realattack5ghz); do
 	if [[ $mac = "< | HWaddress" ]]; then
-		echo ""
+		CHECKMR1 && CHECKMR
 	else
 $METHOD
 sleep $ATTACK
