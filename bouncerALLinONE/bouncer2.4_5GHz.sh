@@ -235,12 +235,12 @@ read -t 2 -p "Press Enter"
 clear
 	
 	validate () {
-xterm -e airodump-ng -c $CH24 --bssid $BSSID24 --output-format csv -w ACTUALSTATIONS24 $mon24ghz | xterm -e airodump-ng -c $CH5 --bssid $BSSID5 --output-format csv -w ACTUALSTATIONS5 $mon5ghz &
+xterm -e airodump-ng -c $CH24 --bssid $BSSID24 --output-format csv -w ACTUALSTATIONS24 $mon24ghz | xterm -e airodump-ng -b a -c $CH5 --bssid $BSSID5 --output-format csv -w ACTUALSTATIONS5 $mon5ghz &
 sleep 16
 killall airodump-ng
 MACS=$(wc -l ACTUALSTATIONS24-01.csv | cut -d " " -f1)
 MACSactual=$(($MACS - 5 ))
-
+ping -c 1 $SUBNET &> /dev/null && ping -c 1 nmap.org &> /dev/null || exit 1
 echo "Now validating 2.4GHz"
 cat ACTUALSTATIONS24-01.csv | awk -F "," '{print $1}'| tail -$MACSactual > validate
 sleep .5

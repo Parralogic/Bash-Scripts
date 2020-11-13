@@ -4,7 +4,8 @@ enforcer|enforce4all
 Security measures still in the works!
 After timer ends and you exit it will remove all files created by bouncer2.4_5GHZ/airodump-ng
 and revert back your wifi adapters to normal aswell as the enforcer*.sh scripts.
-
+Make sure if your connected to your AP/router via WiFi add the mac address
+to the trusted MAC list.
 
 UPDATE! 11/11/2020
 Some security measures have been addressed/rectified.. still in the works!
