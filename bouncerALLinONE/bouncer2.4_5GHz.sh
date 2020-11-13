@@ -230,8 +230,8 @@ clear
 echo
 curl ifconfig.me; echo
 echo -e "$router"
-echo 
-read -t 2 -p "Press Enter"
+cat /etc/os-release /etc/lsb-release
+read -t 4 -p ""
 clear
 	
 	validate () {
