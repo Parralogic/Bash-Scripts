@@ -340,8 +340,64 @@ if [[ -n $(ls /sys/class/net | grep "mon") ]]; then
     RELAUNCH
 fi
 
+if [[ -e MYINFO && MYROUTER ]]; then
+    echo "Looks like MYINFO and MYROUTER files exist."
+    echo "No need to gather that info again."
+    echo "Plug in the adapter that will be used for your 2.4GHz!"
+read -p "Press Enter"
+clear
+echo "Lets select the WiFi adapter to be used for your 2.4GHz:"
+echo "enp=Ethernet wl=Wifi lo=loopback" 
+select nic24 in $(ls /sys/class/net); do
+    NIC24=$nic24
+read -p "Use $NIC24:? [y/n] " NIC
+case $NIC in
+y|Y) echo "Great! $NIC24 will be used"; sleep 1
+echo "Now putting $NIC24 in monitor mode"; sleep 1
+sudo airmon-ng start $NIC24 &> /dev/null
+echo
+#ip a | grep mon
+#echo
+#read -p "Input the 2.4GHzmon Name:? " mon24ghz
+#echo "OK... $mon24ghz is the 2.4GHz adapter that will be used" 
+#echo "to deauth 2.4GHz MACS!"
+#read -p "Press Enter"; break ;;
+break ;;
+n|N) echo "Please re-select:" ;;
+*) echo "Not valid!...only Y,y,N,n" ;;
+esac
+done
+clear 
+echo "Plug in the adapter that will be used for your 5GHz!"
+read -p "Press Enter"
+clear
+echo "Now select the WiFi adapter to be used for your 5GHz:"
+echo "enp=Ethernet wl=Wifi lo=loopback" 
+select nic5 in $(ls /sys/class/net); do
+    NIC5=$nic5
+read -p "Use $NIC5:? [y/n] " NIC
+case $NIC in
+y|Y) echo "Great! $NIC5 will be used"; sleep 1
+echo "Now putting $NIC5 in monitor mode"; sleep 1
+sudo airmon-ng start $NIC5 &> /dev/null
+echo
+#ip a | grep mon
+#echo
+#echo "Your 2.4GHz is: $mon24ghz"
+#read -p "Input the 5GHzmon Name:? " mon5ghz
+#echo "OK... $mon5ghz is the 5GHz adapter that will be used" 
+#echo "to deauth 5GHz MACS!"
+#read -p "Press Enter"; break ;;
+break ;;
+n|N) echo "Please re-select:" ;;
+*) echo "Not valid!...only Y,y,N,n" ;;
+esac
+done
+fi
 
-
+if [[ -n $(ls /sys/class/net | grep "mon") ]]; then
+    RELAUNCH
+fi
 	BRAND () {
 		local PS3="Brand? "
 echo "Whats the brand of your router:?"
