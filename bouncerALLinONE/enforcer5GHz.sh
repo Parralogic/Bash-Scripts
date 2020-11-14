@@ -1,7 +1,7 @@
 #!/bin/bash
 
-BSSID5="E8:65:D4:60:94:45"
-GHZ5=wlp0s19f2u5mon
+BSSID5="00:00:00:00:00:00"
+GHZ5=adapter
 
 
 
