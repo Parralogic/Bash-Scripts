@@ -19,6 +19,12 @@ if [[ $(ip a | grep dynamic | cut -d " " -f 8) = 192.168.1.255 ]]; then
 else
     SUBNET=192.168.0.1
 fi
+if [[ $(ip a | grep dynamic | cut -d " " -f 8) = 192.168.2.255 ]]; then
+    SUBNET=192.168.2.1
+fi
+if [[ $(ip a | grep dynamic | cut -d " " -f 8) = 192.168.11.255 ]]; then
+    SUBNET=192.168.11.1
+fi
 ping -c 1 $SUBNET &> /dev/null && ping -c 1 nmap.org &> /dev/null
 if [[ $? -ne 0 ]]; then
     exit 1
@@ -34,42 +40,42 @@ fi
     }
 
 case $router in
-    Linksys) nmap -O $SUBNET | grep $router ; if [[ $? = 0 ]]; then 
+    Linksys) nmap -O $SUBNET | grep -i $router ; if [[ $? = 0 ]]; then 
     break
      else exit 1
      fi
     ;;
-    D-Link) nmap -O $SUBNET | grep $router ; if [[ $? = 0 ]]; then 
+    D-Link) nmap -O $SUBNET | grep -i $router ; if [[ $? = 0 ]]; then 
     break
      else exit 1
      fi
     ;;
-    Belkin) nmap -O $SUBNET | grep $router ; if [[ $? = 0 ]]; then 
+    Belkin) nmap -O $SUBNET | grep -i $router ; if [[ $? = 0 ]]; then 
     break
      else exit 1
      fi
     ;;
-    Asus) nmap -O $SUBNET | grep $router ; if [[ $? = 0 ]]; then 
+    Asus) nmap -O $SUBNET | grep -i $router ; if [[ $? = 0 ]]; then 
     break
      else exit 1
      fi
     ;;
-    Buffalo) nmap -O $SUBNET | grep $router ; if [[ $? = 0 ]]; then 
+    Buffalo) nmap -O $SUBNET | grep -i $router ; if [[ $? = 0 ]]; then 
     break
      else exit 1
      fi
     ;;
-    Netgear) nmap -O $SUBNET | grep $router ; if [[ $? = 0 ]]; then 
+    Netgear) nmap -O $SUBNET | grep -i $router ; if [[ $? = 0 ]]; then 
     break
      else exit 1
      fi
     ;;
-    Tenda) nmap -O $SUBNET | grep $router ; if [[ $? = 0 ]]; then 
+    Tenda) nmap -O $SUBNET | grep -i $router ; if [[ $? = 0 ]]; then 
     break
      else exit 1
      fi
     ;;
-    TP-Link) nmap -O $SUBNET | grep $router ; if [[ $? = 0 ]]; then 
+    TP-Link) nmap -O $SUBNET | grep -i $router ; if [[ $? = 0 ]]; then 
     break
      else exit 1
      fi
@@ -149,6 +155,14 @@ if [[ $(ip a | grep dynamic | cut -d " " -f 8) = 192.168.1.255 ]]; then
 else
     SUBNET=192.168.0.1
      MR=$(nmap  192.168.0.1 | grep -i $router | cut -d " " -f3)
+fi
+if [[ $(ip a | grep dynamic | cut -d " " -f 8) = 192.168.2.255 ]]; then
+    SUBNET=192.168.2.1
+    MR=$(nmap  192.168.2.1 | grep -i $router | cut -d " " -f3)
+fi
+if [[ $(ip a | grep dynamic | cut -d " " -f 8) = 192.168.11.255 ]]; then
+    SUBNET=192.168.11.1
+    MR=$(nmap  192.168.11.1 | grep -i $router | cut -d " " -f3)
 fi
 ping -c 1 $SUBNET &> /dev/null && ping -c 1 nmap.org &> /dev/null
 if [[ $? -ne 0 ]]; then
@@ -407,6 +421,12 @@ if [[ $(ip a | grep dynamic | cut -d " " -f 8) = 192.168.1.255 ]]; then
 else
 	SUBNET=192.168.0.1
 fi
+if [[ $(ip a | grep dynamic | cut -d " " -f 8) = 192.168.2.255 ]]; then
+    SUBNET=192.168.2.1
+fi
+if [[ $(ip a | grep dynamic | cut -d " " -f 8) = 192.168.11.255 ]]; then
+    SUBNET=192.168.11.1
+fi
 ping -c 1 $SUBNET &> /dev/null && ping -c 1 nmap.org &> /dev/null
 if [[ $? -ne 0 ]]; then
 	exit 1
@@ -422,42 +442,42 @@ fi
     }
 echo $router > MYROUTER
 case $router in
-	Linksys) nmap -O $SUBNET | grep $router ; if [[ $? = 0 ]]; then 
+	Linksys) nmap -O $SUBNET | grep -i $router ; if [[ $? = 0 ]]; then 
     break
      else exit 1
      fi
     ;;
-    D-Link) nmap -O $SUBNET | grep $router ; if [[ $? = 0 ]]; then 
+    D-Link) nmap -O $SUBNET | grep -i $router ; if [[ $? = 0 ]]; then 
     break
      else exit 1
      fi
     ;;
-    Belkin) nmap -O $SUBNET | grep $router ; if [[ $? = 0 ]]; then 
+    Belkin) nmap -O $SUBNET | grep -i $router ; if [[ $? = 0 ]]; then 
     break
      else exit 1
      fi
     ;;
-    Asus) nmap -O $SUBNET | grep $router ; if [[ $? = 0 ]]; then 
+    Asus) nmap -O $SUBNET | grep -i $router ; if [[ $? = 0 ]]; then 
     break
      else exit 1
      fi
     ;;
-    Buffalo) nmap -O $SUBNET | grep $router ; if [[ $? = 0 ]]; then 
+    Buffalo) nmap -O $SUBNET | grep -i $router ; if [[ $? = 0 ]]; then 
     break
      else exit 1
      fi
     ;;
-    Netgear) nmap -O $SUBNET | grep $router ; if [[ $? = 0 ]]; then 
+    Netgear) nmap -O $SUBNET | grep -i $router ; if [[ $? = 0 ]]; then 
     break
      else exit 1
      fi
     ;;
-    Tenda) nmap -O $SUBNET | grep $router ; if [[ $? = 0 ]]; then 
+    Tenda) nmap -O $SUBNET | grep -i $router ; if [[ $? = 0 ]]; then 
     break
      else exit 1
      fi
     ;;
-    TP-Link) nmap -O $SUBNET | grep $router ; if [[ $? = 0 ]]; then 
+    TP-Link) nmap -O $SUBNET | grep -i $router ; if [[ $? = 0 ]]; then 
     break
      else exit 1
      fi
@@ -626,6 +646,14 @@ if [[ $(ip a | grep dynamic | cut -d " " -f 8) = 192.168.1.255 ]]; then
 else
 	SUBNET=192.168.0.1
      MR=$(nmap  192.168.0.1 | grep -i $router | cut -d " " -f3)
+fi
+if [[ $(ip a | grep dynamic | cut -d " " -f 8) = 192.168.2.255 ]]; then
+    SUBNET=192.168.2.1
+    MR=$(nmap  192.168.2.1 | grep -i $router | cut -d " " -f3)
+fi
+if [[ $(ip a | grep dynamic | cut -d " " -f 8) = 192.168.11.255 ]]; then
+    SUBNET=192.168.11.1
+    MR=$(nmap  192.168.11.1 | grep -i $router | cut -d " " -f3)
 fi
 ping -c 1 $SUBNET &> /dev/null && ping -c 1 nmap.org &> /dev/null
 if [[ $? -ne 0 ]]; then
