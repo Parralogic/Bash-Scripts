@@ -1,3 +1,18 @@
+UPDATE! 11/13/2020
+bouncer2.4_5GHz will now be albe to be relaunched without 
+inputting any unnecessary info about your router after the first initiation,
+script should take you to the trusted mac list selection.
+Script creates MYINFO and MYROUTER, to get that prompt/s back
+just delete MYINFO & MYROUTER files!
+also security has been improved. 
+still needs work......
+NOTE! 
+If for some reason you close the terminals and your adaperts are
+still in monitor mode, just make sure the timer.sh has TIME="time" not TIME="how ever many seconds you inputted"
+right underneath ADAPTER5=$(grep "mon" enforcer5GHz.sh | cut -d "=" -f2);
+and just re-execut/run bouncer2.4_5GHz again and will take you back to the 
+trusted mac list selection!
+
 UPDATE! 11/12/2020
 So far both methods working under my setup
 enforcer|enforce4all

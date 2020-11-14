@@ -1,7 +1,7 @@
 #!/bin/bash
 
-BSSID24="00:00:00:00:00:00"
-GHZ24=adapter
+BSSID24="E8:65:D4:60:94:41"
+GHZ24=wlp0s18f2u5mon
 
 
 
