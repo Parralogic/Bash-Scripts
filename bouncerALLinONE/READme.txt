@@ -1,3 +1,9 @@
+UPDATE! 11/14/2020
+Troubleshooting the script!,..... make sure to input the BSSID's of your router in
+capital letters, not lowercase. Example aa:bb:cc:d5:f6:e7 to AA:BB:CC:D5:F6:E7.
+Working on securing the script of misuse!; Example: Using iptables to lock down your network
+traffic on your system, if your not using the script on your own network!
+
 UPDATE! 11/13/2020
 bouncer2.4_5GHz will now be albe to be relaunched without 
 inputting any unnecessary info about your router after the first initiation,
@@ -15,7 +21,6 @@ trusted mac list selection!
 *If my script/s where helpful in any shape way or form or abstract idea
 :FANTASTIC! thats all that matters; and if you feel to contribute to my leisure time for the script/s
 please feel free to paypal me @ https://www.paypal.com/paypalme/Parralogic
-
 
 UPDATE! 11/12/2020
 So far both methods working under my setup
