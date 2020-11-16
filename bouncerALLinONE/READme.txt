@@ -1,3 +1,14 @@
+UPDATE! 11/15/2020
+NEW VERIFY file, it is a copy of bouncer2.4_5GHz.sh, do not remove!
+it will be used to check if the script has been tampred with;
+fixAll, will reset the timer and enforcer scripts incase anything
+goes wrong.... like terminals just close/accidentally while preforming a task.
+Security..still a work in progress....maybe its the best its going to get
+on my end... still working on it.
+Oh yeah dont forget that you can add diffrent types of mac "lists":
+Example: name it whatever you want,.. MYHOME, OFFTOWORK,...whatever
+and just select that appropriate mac list to be trusted!
+
 UPDATE! 11/14/2020
 Troubleshooting the script!,..... make sure to input the BSSID's of your router in
 capital letters, not lowercase. Example aa:bb:cc:d5:f6:e7 to AA:BB:CC:D5:F6:E7.
