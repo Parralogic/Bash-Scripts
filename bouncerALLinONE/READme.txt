@@ -8,6 +8,8 @@ on my end... still working on it.
 Oh yeah dont forget that you can add diffrent types of mac "lists":
 Example: name it whatever you want,.. MYHOME, OFFTOWORK,...whatever
 and just select that appropriate mac list to be trusted!
+Also one last thought.....dont forget its always best to be connected with ethernet to your router
+for best results for that script and just your security in general.
 
 UPDATE! 11/14/2020
 Troubleshooting the script!,..... make sure to input the BSSID's of your router in
