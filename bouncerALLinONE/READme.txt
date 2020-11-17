@@ -1,6 +1,6 @@
 UPDATE! 11/15/2020
 NEW VERIFY file, it is a copy of bouncer2.4_5GHz.sh, do not remove!
-it will be used to check if the script has been tampred with;
+it will be used to check if the script has been tampered with;
 fixAll, will reset the timer and enforcer scripts incase anything
 goes wrong.... like terminals just close/accidentally while preforming a task.
 Security..still a work in progress....maybe its the best its going to get
