@@ -29,7 +29,7 @@ echo "Launch bouncer2.4_5GHz.sh again:? PRESS ENTER"
 read -p "[e] KEY then ENTER to Exit! "
 case $REPLY in
 ""|" ") rm ACTUALSTATIONS24-01.csv ACTUALSTATIONS5-01.csv realattack realattack5ghz validate validate5ghz;sudo ./bouncer2.4_5GHz.sh ;;
-*)for i in `seq 1 4`; do if [[ $(cat bouncer2.4_5GHz.sh | grep -x "VRF$i") != $(cat VERIFY | grep -x "RF$i") ]]; then rm enfor* boun* ti* ; fi; done
+*)for i in `seq 1 6`; do if [[ $(grep "VRF$i" bouncer2.4_5GHz.sh) != $(grep "RF$i" VERIFY) ]]; then rm enfor* boun* ti* ; fi; done
 sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/00:00:00:00:00:00/" enforcer5GHz.sh					
 sed -i "s/$ADAPTER5/adapter/" enforcer5GHz.sh
 sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/00:00:00:00:00:00/" enforcer2.4GHz.sh					

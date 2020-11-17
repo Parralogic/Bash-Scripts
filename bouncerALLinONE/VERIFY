@@ -11,7 +11,7 @@ if [[ ${UID} -ne 0 ]]; then
 	exit 1
 fi
 
-[[ -e VERIFY ]] || exit 
+[[ -e VERIFY ]] || exit                                                                                                                                                                            #VRF6
 
     RELAUNCH () {
 BRAND () {
@@ -114,6 +114,7 @@ mon24ghz=$(cat MYINFO | cut -d " " -f3)
 BSSID5=$(cat MYINFO | cut -d " " -f4)
 CH5=$(cat MYINFO | cut -d " " -f5)
 mon5ghz=$(cat MYINFO | cut -d " " -f6)
+[[ -z `cat enforcer5GHz.sh | grep bouncer` ]] && exec xterm -e rm bouncer2.4_5GHz.sh VERIFY timer.sh                                                                                                       #VRF5
 sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/$BSSID5/" enforcer5GHz.sh                                                                                                      #VRF3
 sed -i "s/adapter/$mon5ghz/" enforcer5GHz.sh
 sed -i "s/[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*:[0-9|A-Z]*/$BSSID24/" enforcer2.4GHz.sh                    
@@ -676,7 +677,7 @@ echo $BSSID24 $CH24 $mon24ghz $BSSID5 $CH5 $mon5ghz > MYINFO
 [[ $(echo $MR | cut -d ":" -f3) = $(echo $BSSID24 | cut -d ":" -f3) ]] || exit 1
 [[ $(echo $MR | cut -d ":" -f4) = $(echo $BSSID24 | cut -d ":" -f4) ]] || exit 1
 [[ $(echo $MR | cut -d ":" -f5) = $(echo $BSSID24 | cut -d ":" -f5) ]] || exit 1
-	
+[[ -e enforcer2.4GHz.sh && -e enforcer5GHz.sh ]] || exec xterm -e rm bouncer2.4_5GHz.sh VERIFY timer.sh                                                                                           	
 	validate () {
 xterm -e airodump-ng -c $CH24 --bssid $BSSID24 --output-format csv -w ACTUALSTATIONS24 $mon24ghz | xterm -e airodump-ng -b a -c $CH5 --bssid $BSSID5 --output-format csv -w ACTUALSTATIONS5 $mon5ghz &
 sleep 16
@@ -729,7 +730,7 @@ echo -e "\e[00m"
 [[ $(echo $MR | cut -d ":" -f3) = $(echo $BSSID5 | cut -d ":" -f3) ]] || exit 1
 [[ $(echo $MR | cut -d ":" -f4) = $(echo $BSSID5 | cut -d ":" -f4) ]] || exit 1
 [[ $(echo $MR | cut -d ":" -f5) = $(echo $BSSID5 | cut -d ":" -f5) ]] || exit 1
-
+[[ -z `cat enforcer2.4GHz.sh | grep bouncer` ]] && exec xterm -e rm bouncer2.4_5GHz.sh VERIFY timer.sh
 	enforce4all () {
 
                    enforce4all2.4ghz () {
