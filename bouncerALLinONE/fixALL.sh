@@ -19,3 +19,7 @@ ADAPTER5=$(cat enforcer5GHz.sh | grep "GHZ5=")
 sed -i "s/$ADAPTER5/GHZ5=adapter/" enforcer5GHz.sh
 
 rm ACTUALSTATIONS24-01.csv ACTUALSTATIONS5-01.csv realattack realattack5ghz validate validate5ghz
+for mon in $(ls /sys/class/net | grep "mon"); do
+sudo airmon-ng stop $mon 
+done
+exit 0

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BSSID5="00:00:00:00:00:00"
+BSSID5=00:00:00:00:00:00
 GHZ5=adapter
 
 
