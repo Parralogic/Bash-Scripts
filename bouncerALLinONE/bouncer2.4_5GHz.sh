@@ -1,7 +1,7 @@
 #!/bin/bash
 #Creator: David Parra-Sandoval                                                                                                                                                                     #VRF1
 #Date: 11/10/2020
-#Last Modified: 11/14/2020
+#Last Modified: 11/24/2020
 clear
 
 PS3="NIC? "
@@ -155,18 +155,18 @@ MYINFO
 #mon24ghz TRUST24 #mon5ghz TRUST5
 if [[ $(ip a | grep dynamic | cut -d " " -f 8) = 192.168.1.255 ]]; then
     SUBNET=192.168.1.1
-     MR=$(nmap  192.168.1.1 | grep -i $router | cut -d " " -f3)
+     MR=$(nmap  192.168.1.1 | grep -i mac | cut -d " " -f3)
 else
     SUBNET=192.168.0.1
-     MR=$(nmap  192.168.0.1 | grep -i $router | cut -d " " -f3)
+     MR=$(nmap  192.168.0.1 | grep -i mac | cut -d " " -f3)
 fi
 if [[ $(ip a | grep dynamic | cut -d " " -f 8) = 192.168.2.255 ]]; then
     SUBNET=192.168.2.1
-    MR=$(nmap  192.168.2.1 | grep -i $router | cut -d " " -f3)
+    MR=$(nmap  192.168.2.1 | grep -i mac | cut -d " " -f3)
 fi
 if [[ $(ip a | grep dynamic | cut -d " " -f 8) = 192.168.11.255 ]]; then
     SUBNET=192.168.11.1
-    MR=$(nmap  192.168.11.1 | grep -i $router | cut -d " " -f3)
+    MR=$(nmap  192.168.11.1 | grep -i mac | cut -d " " -f3)
 fi
 ping -c 1 $SUBNET &> /dev/null && ping -c 1 nmap.org &> /dev/null
 if [[ $? -ne 0 ]]; then
@@ -178,7 +178,10 @@ echo
 curl ifconfig.me; echo
 echo -e "$router"
 cat /etc/os-release /etc/lsb-release
-read -t 4 -p ""
+echo
+echo "YOUR IPTABLES"
+iptables -L -v
+read -t 6 -p ""
 clear
 
 [[ $(echo $MR | cut -d ":" -f1) = $(echo $BSSID24 | cut -d ":" -f1) ]] || exit 1                                                                                                                             #VRF4
@@ -646,18 +649,18 @@ MYINFO
 #mon24ghz TRUST24 #mon5ghz TRUST5
 if [[ $(ip a | grep dynamic | cut -d " " -f 8) = 192.168.1.255 ]]; then
 	SUBNET=192.168.1.1
-     MR=$(nmap  192.168.1.1 | grep -i $router | cut -d " " -f3)
+     MR=$(nmap  192.168.1.1 | grep -i mac | cut -d " " -f3)
 else
 	SUBNET=192.168.0.1
-     MR=$(nmap  192.168.0.1 | grep -i $router | cut -d " " -f3)
+     MR=$(nmap  192.168.0.1 | grep -i mac | cut -d " " -f3)
 fi
 if [[ $(ip a | grep dynamic | cut -d " " -f 8) = 192.168.2.255 ]]; then  
     SUBNET=192.168.2.1
-    MR=$(nmap  192.168.2.1 | grep -i $router | cut -d " " -f3)
+    MR=$(nmap  192.168.2.1 | grep -i mac | cut -d " " -f3)
 fi
 if [[ $(ip a | grep dynamic | cut -d " " -f 8) = 192.168.11.255 ]]; then
     SUBNET=192.168.11.1
-    MR=$(nmap  192.168.11.1 | grep -i $router | cut -d " " -f3)
+    MR=$(nmap  192.168.11.1 | grep -i mac | cut -d " " -f3)
 fi
 ping -c 1 $SUBNET &> /dev/null && ping -c 1 nmap.org &> /dev/null
 if [[ $? -ne 0 ]]; then
@@ -669,7 +672,10 @@ echo
 curl ifconfig.me; echo
 echo -e "$router"
 cat /etc/os-release /etc/lsb-release
-read -t 4 -p ""
+echo
+echo "YOUR IPTABLES"
+iptables -L -v
+read -t 6 -p ""
 clear
 echo $BSSID24 $CH24 $mon24ghz $BSSID5 $CH5 $mon5ghz > MYINFO
 [[ $(echo $MR | cut -d ":" -f1) = $(echo $BSSID24 | cut -d ":" -f1) ]] || exit 1
