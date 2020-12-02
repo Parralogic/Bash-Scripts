@@ -3,12 +3,13 @@
 #Date: 11/01/2020
 #Last Modified: 11/01/2020
 clear
-
-read -p "This script will guide you to install Arch-Linux: Press ANY key to continue WARNING STILL IN THE WORKS"
+if [[ $(lsblk | grep "mnt") = 1 ]]; then
+echo "This script will guide you to install Arch-Linux:"
+read -p "Press ANY key to continue WARNING STILL IN THE WORKS"
 clear
 echo "First lets select your keyboard layout, only worry about the NAME minus the extension of (.map.gz)"
 echo "So if your keyboard layout is in /usr/share/kbd/keymaps/i386/azerty/fr-latin1.map.gz"
-echo "Only input fr-latin1. Use spacebar or the up/down arrowkeys [q] exit keymaps"
+echo "Only input fr-latin1, Use spacebar or the up/down arrowkeys [q] exit keymaps"
 read -p "Press Enter"
 ls /usr/share/kbd/keymaps/**/* | less
 read -p "Whats the name of the keyboard layout:? " KEYBOARD
@@ -25,7 +26,7 @@ echo
 read -p "Hard drive to use:? Ex. sda or sdb .. ect " DRIVE
 cfdisk /dev/$DRIVE
 wait
-echo "Example: Only sda1 sda2 sdb1 sdb2...etc not /dev/sda1 /dev/sdb2...etc"
+echo "Only use sda1 sda2 sdb1 sdb2...etc not /dev/sda1 /dev/sdb2...etc below"
 read -p "Whats the root partition:? " ROOTPAR
 read -p "Whats the swap partition if any:? " SWAPPAR
 read -p "Whats the boot or efi partition if any:? " BOOTPAR
@@ -43,7 +44,12 @@ mount /dev/$ROOTPAR /mnt
 pacstrap /mnt base linux linux-firmware
 wait
 genfstab -U /mnt >> /mnt/etc/fstab
+echo "Now chrooting into the new installation, to finalize the install."
+echo "Script is going to terminate re-execute ./archinstaller.sh to continue"
+read -p "archinstaller.sh will be copied to the new root partition: Press Enter"
+cp archinstaller.sh /mnt
 arch-chroot /mnt
+else
 read -p "Third lets set your timezone: Press Enter"
 echo
 ls /usr/share/zoneinfo/
@@ -77,4 +83,5 @@ read -p "Last lets install the boot loader: Press Enter"
 pacman -S grub
 grub-install /dev/$DRIVE
 grub-mkconfig -o /boot/grub/grub.cfg
+fi
 
