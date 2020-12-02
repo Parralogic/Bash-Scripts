@@ -3,7 +3,8 @@
 #Date: 11/01/2020
 #Last Modified: 11/01/2020
 clear
-if [[ $(lsblk | grep -w "/mnt") = 1 ]]; then
+read -p "This installer script has 2 phase's, is this your first time running the script [y/n]? " YN
+if [[ $YN = [yY]* ]]; then
 echo "This script will guide you to install Arch-Linux:"
 read -p "Press ANY key to continue WARNING STILL IN THE WORKS"
 clear
@@ -78,10 +79,16 @@ echo "::1		localhost" >> /etc/hosts
 echo "127.0.1.1	$HOSTNAME.localdomain	$HOSTNAME" >> /etc/hosts
 mkinitcpio -P
 clear
+echo "root password"
 passwd
 read -p "Last lets install the boot loader: Press Enter"
 pacman -S grub
+lsblk
+read -p "Install grub on drive:? Ex: sda sdb sdc " DRIVE
 grub-install /dev/$DRIVE
 grub-mkconfig -o /boot/grub/grub.cfg
+read -p "Now installing networkmanager so when you reboot you'll have an internet connection: Press Enter"
+pacman -S networkmanager
+systemctl enable NetworkManager
 fi
 
