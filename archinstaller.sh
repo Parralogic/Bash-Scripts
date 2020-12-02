@@ -1,14 +1,14 @@
 #!/bin/bash
 #Creator: David Parra-Sandoval
 #Date: 11/01/2020
-#Last Modified: 11/01/2020
+#Last Modified: 11/02/2020
 clear
 read -p "This installer script has 2 phase's, is this your first time running the script [y/n]? " YN
 if [[ $YN = [yY]* ]]; then
 echo "This script will guide you to install Arch-Linux:"
 read -p "Press ANY key to continue WARNING STILL IN THE WORKS"
 clear
-echo "First lets select your keyboard layout, only worry about the NAME minus the extension of (.map.gz)"
+echo "First lets select your keyboard layout, only worry about the (NAME) minus the extension of (.map.gz)"
 echo "So if your keyboard layout is in /usr/share/kbd/keymaps/i386/azerty/fr-latin1.map.gz"
 echo "Only input fr-latin1, Use spacebar or the up/down arrowkeys [q] exit keymaps"
 read -p "Press Enter"
@@ -27,7 +27,7 @@ echo
 read -p "Hard drive to use:? Ex. sda or sdb .. ect " DRIVE
 cfdisk /dev/$DRIVE
 wait
-echo "Only use sda1 sda2 sdb1 sdb2...etc not /dev/sda1 /dev/sdb2...etc below"
+echo "NOTE! Only use sda1 sda2 sdb1 sdb2...etc not /dev/sda1 /dev/sdb2...etc below"
 read -p "Whats the root partition:? " ROOTPAR
 read -p "Whats the swap partition if any:? " SWAPPAR
 read -p "Whats the boot or efi partition if any:? " BOOTPAR
@@ -37,6 +37,11 @@ sd* )
 mkswap /dev/$SWAPPAR
 swapon /dev/$SWAPPAR
 ;;
+esac
+case $BOOTPAR in
+""|" " ) echo "No boot/efi created!"; sleep 3 ;;
+sd* ) 
+mkfs.fat -F32 /dev/$BOOTPAR
 esac
 mkfs.ext4 /dev/$ROOTPAR
 wait
@@ -64,7 +69,8 @@ echo
 ln -sf /usr/share/zoneinfo/$REGION/$CITY /etc/localtime
 hwclock --systohc
 clear
-read -p "Fourth Localization, We need to edit /etc/locale.gen and uncomment en_US.UTF-8 UTF-8 and other needed locales: Press Enter"
+echo "Fourth Localization, We need to edit /etc/locale.gen and uncomment en_US.UTF-8 UTF-8 and other needed locales:"
+read -p "Press Enter: nano editor will be installed."
 pacman -S nano
 nano  /etc/locale.gen
 wait
@@ -81,14 +87,26 @@ mkinitcpio -P
 clear
 echo "root password"
 passwd
-read -p "Last lets install the boot loader: Press Enter"
+echo "Next lets install the grub bootloader: if you created an efi partition type efi"
+read -p "To install the necessary packages for an efi setup : " EFI
+case $EFI in
+""|" " )
 pacman -S grub
 lsblk
 read -p "Install grub on drive:? Ex: sda sdb sdc " DRIVE
 grub-install /dev/$DRIVE
-grub-mkconfig -o /boot/grub/grub.cfg
+grub-mkconfig -o /boot/grub/grub.cfg ;;
+efi )
+pacman -S grub efibootmgr dosfstools os-prober mtools
+mkdir /boot/EFI
+read -p "whats the boot/efi partition:? " BOOTPAR
+mount /dev/$BOOTPAR /boot/EFI
+grub-install --target=x86_64-efi --bootloader-id=grub_uefi --recheck
+grub-mkconfig -o /boot/grub/grub.cfg ;;
+esac
 read -p "Now installing networkmanager so when you reboot you'll have an internet connection: Press Enter"
 pacman -S networkmanager
 systemctl enable NetworkManager
 fi
-
+##Thanks to DT Youtube channel:DistroTube
+##https://wiki.archlinux.org/index.php/installation_guide
