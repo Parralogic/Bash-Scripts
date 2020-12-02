@@ -3,7 +3,7 @@
 #Date: 11/01/2020
 #Last Modified: 11/02/2020
 clear
-read -p "This installer script has 2 phase's, is this your first time running the script [y/n]? " YN
+read -p "This installer script has 2 phases, is this your first time running the script [y/n]? " YN
 if [[ $YN = [yY]* ]]; then
 echo "This script will guide you to install Arch-Linux:"
 read -p "Press ANY key to continue WARNING STILL IN THE WORKS"
@@ -50,6 +50,7 @@ mount /dev/$ROOTPAR /mnt
 pacstrap /mnt base linux linux-firmware
 wait
 genfstab -U /mnt >> /mnt/etc/fstab
+clear
 echo "Now chrooting into the new installation, to finalize the install."
 echo "Script is going to terminate re-execute ./archinstaller.sh to continue"
 read -p "archinstaller.sh will be copied to the new root partition: Press Enter"
@@ -77,7 +78,8 @@ wait
 locale-gen
 touch /etc/locale.conf
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
-read -p "What do you want to name this computer aka hostname, used to distinguish you on the network:? " HOSTNAME
+echo "What do you want to name this computer aka hostname," 
+read -p "used to distinguish you on the network:? " HOSTNAME
 echo "$HOSTNAME" > /etc/hostname
 touch /etc/hosts
 echo "127.0.0.1	localhost" >> /etc/hosts
