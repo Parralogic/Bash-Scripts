@@ -8,10 +8,9 @@ read -p "This script will guide you to install Arch-Linux: Press ANY key to cont
 clear
 echo "First lets select your keyboard layout, only worry about the NAME minus the extension of '.map.gz'"
 echo "So if your keyboard layout is in /usr/share/kbd/keymaps/i386/azerty/fr-latin1.map.gz"
-echo "Only input fr-latin1. Use spacebar or the up/down arrowkeys 'q' exit keymaps"
+echo "Only input fr-latin1. Use spacebar or the up/down arrowkeys [q] exit keymaps"
 read -p "Press Enter"
-ls /usr/share/kbd/keymaps/**/*.map.gz | less
-wait
+ls /usr/share/kbd/keymaps/**/* | less
 read -p "Whats the name of the keyboard layout:? " KEYBOARD
 loadkeys $KEYBOARD
 timedatectl set-ntp true
@@ -32,10 +31,9 @@ read -p "Whats the swap partition if any:? " SWAPPAR
 read -p "Whats the boot or efi partition if any:? " BOOTPAR
 if [[ $SWAPPAR = " " ]]; then
 echo "No swap will be used"
-sleep 2
+sleep 6
 else
 mkswap /dev/$SWAPPAR
-wait
 swapon /dev/$SWAPPAR
 fi
 mkfs.ext4 /dev/$ROOTPAR
