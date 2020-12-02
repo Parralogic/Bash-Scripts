@@ -26,7 +26,7 @@ echo
 read -p "Hard drive to use:? Ex. sda or sdb .. ect " DRIVE
 cfdisk /dev/$DRIVE
 wait
-echo "Example: Only sda1 sda2 sdb1 sdb2...etc not /dev/sda1 /dev/sdb2...etc
+echo "Example: Only sda1 sda2 sdb1 sdb2...etc not /dev/sda1 /dev/sdb2...etc"
 read -p "Whats the root partition:? " ROOTPAR
 read -p "Whats the swap partition if any:? " SWAPPAR
 read -p "Whats the boot or efi partition if any:? " BOOTPAR
