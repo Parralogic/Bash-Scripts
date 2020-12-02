@@ -3,7 +3,7 @@
 #Date: 11/01/2020
 #Last Modified: 11/01/2020
 clear
-if [[ $(lsblk | grep "mnt") = 1 ]]; then
+if [[ $(lsblk | grep -w "/mnt") = 1 ]]; then
 echo "This script will guide you to install Arch-Linux:"
 read -p "Press ANY key to continue WARNING STILL IN THE WORKS"
 clear
