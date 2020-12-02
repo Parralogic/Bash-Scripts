@@ -6,7 +6,7 @@ clear
 
 read -p "This script will guide you to install Arch-Linux: Press ANY key to continue WARNING STILL IN THE WORKS"
 clear
-echo "First lets select your keyboard layout, only worry about the NAME minus the extension of '.map.gz'"
+echo "First lets select your keyboard layout, only worry about the NAME minus the extension of (.map.gz)"
 echo "So if your keyboard layout is in /usr/share/kbd/keymaps/i386/azerty/fr-latin1.map.gz"
 echo "Only input fr-latin1. Use spacebar or the up/down arrowkeys [q] exit keymaps"
 read -p "Press Enter"
@@ -29,18 +29,19 @@ echo "Example: Only sda1 sda2 sdb1 sdb2...etc not /dev/sda1 /dev/sdb2...etc"
 read -p "Whats the root partition:? " ROOTPAR
 read -p "Whats the swap partition if any:? " SWAPPAR
 read -p "Whats the boot or efi partition if any:? " BOOTPAR
-if [[ $SWAPPAR = " " ]]; then
-echo "No swap will be used"
-sleep 6
-else
+case $SWAPPAR in
+""|" " ) echo "No swap created!"; sleep 3 ;;
+sd* ) 
 mkswap /dev/$SWAPPAR
 swapon /dev/$SWAPPAR
-fi
+;;
+esac
 mkfs.ext4 /dev/$ROOTPAR
 wait
 clear
 mount /dev/$ROOTPAR /mnt
 pacstrap /mnt base linux linux-firmware
+wait
 genfstab -U /mnt >> /mnt/etc/fstab
 arch-chroot /mnt
 read -p "Third lets set your timezone: Press Enter"
