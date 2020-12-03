@@ -1,7 +1,7 @@
 #!/bin/bash
 #Creator: David Parra-Sandoval
-#Date: 11/01/2020
-#Last Modified: 11/02/2020
+#Date: 12/01/2020
+#Last Modified: 12/02/2020
 clear
 read -p "This installer script has 2 phases, is this your first time running the script [y/n]? " YN
 if [[ $YN = [yY]* ]]; then
@@ -70,14 +70,18 @@ echo
 ln -sf /usr/share/zoneinfo/$REGION/$CITY /etc/localtime
 hwclock --systohc
 clear
-echo "Fourth Localization, We need to edit /etc/locale.gen and uncomment en_US.UTF-8 UTF-8 and other needed locales:"
+echo "Fourth Localization, We need to edit /etc/locale.gen and uncomment en_US.UTF-8 UTF-8"
+echo "and other needed locales:"
 read -p "Press Enter: nano editor will be installed."
 pacman -S nano
 nano  /etc/locale.gen
 wait
 locale-gen
+clear
+localectl list-locales
 touch /etc/locale.conf
-echo "LANG=en_US.UTF-8" > /etc/locale.conf
+read -p "system locale to use from above:? " LOCALE
+echo "LANG=$LOCALE" >> /etc/locale.conf
 echo "What do you want to name this computer aka hostname," 
 read -p "used to distinguish you on the network:? " HOSTNAME
 echo "$HOSTNAME" > /etc/hostname
@@ -89,8 +93,8 @@ mkinitcpio -P
 clear
 echo "root password"
 passwd
-echo "Next lets install the grub bootloader: if you created an efi partition type efi"
-read -p "To install the necessary packages for an efi setup : " EFI
+echo "Next lets install the grub bootloader: if you created an efi partition, type efi"
+read -p "to install the necessary packages for an efi setup : " EFI
 case $EFI in
 ""|" " )
 pacman -S grub
@@ -101,14 +105,19 @@ grub-mkconfig -o /boot/grub/grub.cfg ;;
 efi )
 pacman -S grub efibootmgr dosfstools os-prober mtools
 mkdir /boot/EFI
+lsblk
 read -p "whats the boot/efi partition:? " BOOTPAR
 mount /dev/$BOOTPAR /boot/EFI
 grub-install --target=x86_64-efi --bootloader-id=grub_uefi --recheck
 grub-mkconfig -o /boot/grub/grub.cfg ;;
 esac
+echo
 read -p "Now installing networkmanager so when you reboot you'll have an internet connection: Press Enter"
 pacman -S networkmanager
 systemctl enable NetworkManager
+clear
+echo -e "\e[92mGREAT! Arch SEEMS to be installed SUCCESSFULLY!, now just reboot\e[0m"
+read -p "in the prompt now type exit and reboot: Press Enter"
 fi
 ##Thanks to DT Youtube channel:DistroTube
 ##https://wiki.archlinux.org/index.php/installation_guide
