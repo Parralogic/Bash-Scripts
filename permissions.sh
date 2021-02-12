@@ -4,6 +4,12 @@
 #Last Modified: 02/12/2021
 clear
 
+    ALLFILES () {
+    for FILE in *; do
+    chmod 000 $FILE
+    chmod -v u+$OWNER $FILE && chmod -v g+$GROUP $FILE && chmod -v o+$OTHERS $FILE
+    done
+    }
 if [[ -z $@ ]]; then
 echo "Usage $0 FILE1 FILE2 FILE3...etc"
 
@@ -19,8 +25,13 @@ chmod 000 $FILE
 echo -e -n "USER|OWNER of the file [\e[91m$FILE\e[00m] will be able to [r]ead [w]rite e[x]ecute:? "; read OWNER
 read -p "GROUP [r]ead [w]rite e[x]ecute:? " GROUP
 read -p "OTHERS [r]ead [w]rite e[x]ecute:? " OTHERS
+read -p "Apply to [a]ll FILES!? (y/n) " 
+case $REPLY in
+y | Y) ALLFILES; break ;;
+n | N)
 chmod -v u+$OWNER $FILE && chmod -v g+$GROUP $FILE && chmod -v o+$OTHERS $FILE
-read -p "Press Enter" ; clear
+read -p "Press Enter" ; clear ;;
+esac
 fi
 done
 fi
